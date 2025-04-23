@@ -1,0 +1,27 @@
+Redirection allows you to manage the flow of data between commands, files, and the terminal.
+    • ls abd.txt ghn.txt 		#It will list the details of the files
+    • ls > output.txt			#It will list the details of the files in directory to output.txt file
+    • echo "Hello, World!" > output.txt  		#it will overwrite output.txt file
+echo "This is appended." >> output.txt 	#appending to the file instead of overwriting)
+    • The pipe operator (|) takes the output of the command on its left (ls -l) and uses it as input for the command on its right.
+    • ls –l /etc | head 		(Pipes connects the 2 process)
+ls /etc | wc (2 commands working together, wc counts the No of lines, words, & bytes.)
+ls /etc | wc –l
+ls -l | grep output (Will follow ls -l and grep search text in file with output names only:
+	-rw-r-----   1 root root         33 Dec 25 23:21 output.txt
+ls /etc | wc
+	    238     238    2290
+ls /etc | wc -l  (you can try l, a or c)
+	238
+    • Error output:
+2> Redirects the standard error (list a file that doesn't exist, producing an error)
+ls nonexistentfile 2> error.log
+	2>> Redirects the standard error (list a file that doesn't exist, producing an error but will be appended)
+ls nonexistentfile1 2>> error.log
+&> Redirect Both Standard Output and Standard Error
+ls &> output.log (If the file already exists, it will be overwritten)
+ls >> output.log 2>&1 (If the file already exists, the content will be appended instead of overwritten.)
+ls some_directory &> result.log (If some_directory doesn't exist, both the error message and any standard output will be redirected to result.log)
+&>>: Redirect Both Standard Output and Standard Error (Append)
+You can combine multiple redirections in a single command
+command > output.txt 2> error.txt (ls /nonexistent > output.txt 2> error.txt)
