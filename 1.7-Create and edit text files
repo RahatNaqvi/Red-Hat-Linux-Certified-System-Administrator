@@ -1,0 +1,6 @@
+        ◦ We have discussed earlier, touch, echo, nano, vi, vim, cat
+        ◦ printf "Line 1\nLine 2\n" > filename.txt	(To add formatted content using printf)
+        ◦ cat << EOF > filename.txt	(You can create files with multiple lines of content)
+This is line 1.
+This is line 2.
+EOF
