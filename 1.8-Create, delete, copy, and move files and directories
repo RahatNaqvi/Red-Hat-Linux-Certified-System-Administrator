@@ -1,0 +1,22 @@
+    • Create directory:
+mkdir directory_name
+mkdir -p parent_directory/child_directory	(Create parent & child dir in 1 command)
+Mkdir –p A/B/C (to make dir inside each other)
+mkdir test4 && cd test4 (Make multiple directories and change to new directory)
+    • Delete file and directory:
+rm filename.txt 
+rm -f filename.txt	(Deletes the file without prompting for confirmation)
+rmdir directory_name		rmdir test2 (To remove empty directory)
+rm -r directory_name	(Deletes a directory and all its contents.)
+rm -rf directory_name	(Deletes the directory and contents without confirmation)
+    • Copy file and directory:
+cp source_file.txt destination_file.txt	（Copy and name as destination.txt）
+cp source_file.txt /path/to/destination/		(Copy To Another Directory)
+cp -r source_directory/ destination_directory/	(Copies the directory and its contents recursively.)
+    • Rename file and directory:	(mv)
+mv old_filename.txt new_filename.txt (To rename file)
+mv hhh.txt LinuxLearning.txt 
+mv filename.txt /path/to/destination/	(Move to Another Directory)
+mv old_directory_name/ new_directory_name/	(Rename a Directory)
+mv directory_name/ /path/to/destination/	(Move to Another Location:)
+    • mv 2.txt /Rahat			(To move file to directory)
