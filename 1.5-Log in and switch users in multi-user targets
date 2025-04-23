@@ -1,0 +1,16 @@
+A multiuser target refers to a runlevel (or target) where multiple users can log in to the system simultaneously. It is equivalent to the traditional runlevel 3 in SysV init systems, providing a full multiuser environment without a graphical interface. Switch to Multiuser Target mean to change to the multiuser target without restarting. 
+Simply logging in the system, and for switching user use su (substitute user)
+    • Su username or su - username (the username you want to enter)
+    • Su – (for root)
+    • sudo – i (for root execution only without switching but gaining the root access)
+    • sudo -u username command (Run Command as Another User e.g.) 
+sudo -u alice whoami
+    • logout or exit
+    • for remote login use ssh username@hostname
+    • systemctl get-default (You can check the current target using)
+    • sudo systemctl isolate multi-user.target (This immediately transitions the system to the multiuser target)
+    • Switching Virtual Terminals: In a multiuser system, you can switch between multiple virtual terminals. Access Different TTYs: Use Ctrl + Alt + F1 to Ctrl + Alt + F6 to switch between the available TTYs:
+Ctrl + Alt + F1 to F6: Access different terminal sessions (TTYs).
+Ctrl + Alt + F7: Often reserved for GUI if a graphical target is active.
+Log in on the new TTY with your username and password.
+    • Switch back to the original session using the same key combinations
