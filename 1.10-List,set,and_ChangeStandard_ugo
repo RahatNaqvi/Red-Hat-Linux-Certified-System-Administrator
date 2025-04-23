@@ -1,0 +1,18 @@
+        ◦ ls –l file name		(Shows the list file and directory permissions)
+        ◦ chmod (Assign permissions using categories (u, g, o, a) and permissions (r, w, x)
+chmod u+rw file.txt	(Grant read and write to the user)
+chmod o-x file.txt		(Remove execute permission for others)
+chmod a+r file.txt		(Make a file readable by everyone)
+u+x 				Add execute permission for the owner.
+u-x					Remove execute permission from the owner.
++x or a+x 			Add execute permission for the owner, group, and world. 
+o-rw					Remove the read and write permission from anyone besides the owner and group owner.
+go=rw 				Set the group owner and others have read and write permission. If either the group owner or others previously had execute permissions, they are removed.			chmod go=rw myfile.txt
+u+x, go=rx			Add execute permission for the owner and set the permissions for the group and others to read and execute. Multiple specifications may be separated by commas.
+        ◦ Permissions using a 3-digit octal number. Each digit corresponds to ugo:
+4: Read (r)		2: Write (w)		1: Execute (x)		0: No permission
+chmod 755 file.txt	(Grant rwxr-xr-x (755) permissions)
+        ◦ Changing Ownership （Use the chown command）
+chown newuser file.txt
+chown [user][:group] file.txt			chown newuser:newgroup file.txt
+chown Rahat:Rahat permission -R	-R = recursive, so apply ownership to all files and subfolders inside the permission directory. All files and subfolders inside permission will also be owned by Rahat
