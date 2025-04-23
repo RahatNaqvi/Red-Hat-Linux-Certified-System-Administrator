@@ -1,0 +1,37 @@
+Grep is a powerful command-line tool used to search for specific patterns in text files. 
+        ◦ grep [options] 'pattern' file (pattern - expression you're searching for)
+grep 'hello' file.txt
+grep -i 'hello' file.txt (Use -i to ignore case sensitivity)
+Question: List the lines containing the word root (case insensitive) in /etc/groups file
+Answer:		grep -i “root” /etc/group (-i means case insensitive)
+Question: Find the word "sbin" in /etc/passwd and copy it into the file /tmp/pass
+Answer: grep “sbin” /etc/passwd > /tmp/pass 
+        ◦ grep 'h.llo' file.txt (. For any character)
+        ◦ grep 'lo*' file.txt (will match any occurrence of "l" followed by "o", such as l, loo, looo, etc)
+        ◦ grep 'h[aeiou]llo' file.txt (will match words like hello, hallo, hollo, hiello, etc)
+        ◦ grep '[a-z]ello' file.txt (will match aello, bello, ..., zello)
+        ◦ grep 'h[^e]llo' file.txt (Negate a Character Class: This will match hallo, hxllo, but not hello)
+        ◦ grep -E 'lo+' file.txt (+ means "one or more occurrences" of the previous character. However, you need to enable extended regex with -E or use egrep instead of grep)
+        ◦ grep '^start' file.txt (Match any line that starts with the word start.)
+        ◦ grep 'end$' file.txt (Match any line that ends with the word end.)
+        ◦ Search multiple patterns by using -e or the pipe | operator inside the regular expression.
+        ◦ grep -e 'hello' -e 'world' file.txt (Match lines that contain either hello or world.)
+        ◦ Using | in a regular expression:			grep 'hello|world' file.txt 
+This works only with extended regex (-E flag).) grep -E 'hello|world' file.txt
+        ◦ grep -E '\bhello\b' file.txt (Match hello as a whole word, not word like hellos or hellooo)
+        ◦ grep -n 'hello' file.txt (Shows the line number along with the matching line.)
+        ◦ grep -v 'hello' file.txt (Shows all lines from file.txt that do not contain hello.)
+        ◦ grep -c 'hello' file.txt (Display the count of lines containing the word hello.)
+        ◦ grep -r 'hello' /path/to/directory (search pattern in all files in a directory & subdirectories)
+        ◦ grep -o 'hello' file.txt (Print each occurrence of hello found in file.txt, each on a new line)
+-v : Invert match (show lines that do not match the pattern).
+-n : Show line numbers.
+-r or -R : Recursive search in directories.
+-E : Enable extended regular expressions (e.g., +, ?, |).
+-o : Print only the matched part of the line.
+-c : Count the number of matching lines.
+-l : Show only the names of files containing the pattern.
+Assignment: How to find root from passwd and copy to mnt folder pass file?
+root@rahat:/mnt# grep "root" /etc/passwd > /mnt/pass 
+root@rahat:/mnt# cat pass
+root:x:0:0:root:/root:/bin/bash
