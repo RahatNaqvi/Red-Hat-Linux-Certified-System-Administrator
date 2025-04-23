@@ -1,0 +1,5 @@
+    • ln [source_file] [link_name] (Create hard & soft (symbolic) links using the ln command)
+ln original.txt hardlink.txt 
+    • ln -s [source_file_or_directory] [link_name] (soft link is like a shortcut to the original file, pointing to its path rather than the inode)
+ln -s original.txt softlink.txt 
+    • ls -li		(You will see the same inode for original.txt and hardlink.txt whereas softlink.txt will show a different inode and a path reference.
