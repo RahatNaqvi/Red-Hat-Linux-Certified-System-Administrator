@@ -1,0 +1,28 @@
+SSH stands for Secure Socket Shell, or just Secure Shell. It is a network protocol that allows you to log into remote machines and execute commands on them. If you want to connect machine 1 which is at 9th floor but you want to access at machine2 which is at ground. You only need the IP of machine1 and both should be at same network.
+The basic syntax to launch SSH is:
+[ssh] [user_name@hostname] or [ssh] [user_name@ipaddress]
+ssh cloud_user@54.82.999.10	
+ssh username@ipaddress e.g. ssh -i ubonto@44.203.80.26
+sudo apt update or		sudo apt install openssh-client (To install open ssh)
+ssh -V (To check if SSH is installed)
+If on workstation-1 you want to connect the workstation-2 then get the IP of workstation-2 lets say it is 192.168.43.22 then on terminal of workstation-1 type 	ssh root @192.168.43.22 and ls	then on workstation-2 	ls	both will be same as will be connected. You can work properly. Then you can create, operate and fully work on remote machine.
+            ▪ By default, SSH uses port 22. If the remote system uses a custom port, specify it using the -p option:
+            ▪ ssh -p 2222 user@hostname (Here, 2222 is the custom SSH port.)
+            ▪ To avoid typing, you can create an SSH config file (usually located at ~/.ssh/config) that defines shorthand for remote connections. Config file is as (myserver.sh):
+            ▪ Host myserver
+  		HostName 192.168.1.100
+  		User user
+  		Port 22
+  		IdentityFile ~/.ssh/id_rsa
+ssh-keygen -t rsa -b 4096		save
+            ▪ ssh myserver (will connect server)
+            ▪ ssh user@hostname 'ls -l /home/user' (List files in /home/user remote system without logging)
+            ▪ SSH can forward ports from the remote system to your local machine. This is useful for securely accessing services behind a firewall or NAT.
+ssh -L 8080:localhost:80 user@hostname (Forwards port 80 on the remote machine (localhost refers to the remote machine) to port 8080 on your local machine)
+    • Copy a file from local to remote:
+scp localfile.txt user@hostname:/path/to/remote/directory/ 
+    • Copy a file from remote to local:
+s	cp user@hostname:/path/to/remotefile.txt /path/to/local/directory/
+    • ssh -f user@hostname 'some command' (run an SSH session in the background)
+    • ssh -A user@hostname (use your local SSH keys on a remote machine (e.g., to access another system from the remote machine), use the -A option to forward your authentication agent)
+Troubleshooting SSH: If you're unable to connect, check whether the firewall on the remote system is blocking port 22 or whatever custom port SSH is using
