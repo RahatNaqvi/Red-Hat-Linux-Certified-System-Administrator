@@ -1,0 +1,25 @@
+Archiving, compressing, unpacking, and uncompressing files in Linux are common tasks for file management and reducing storage usage. Tools like tar, gzip, and bzip2 help achieve these goals efficiently.
+tar stands for "tape archive." It combines multiple files or directories into a single archive file, commonly called a tarball. It does not compress by itself but can be combined with compression tools like gzip or bzip2.
+    • tar -cvf archive.tar file1 file2 directory/	(Create a tar Archive)
+tar cvf firstTar1.tar mmmm.txt nnn.txt mnmnm.txt
+tar cvf /mnt/copy/D1.tar /mnt (is a tar command that creates an archive file named D1.tar in the /mnt/copy/ directory, containing the contents of the /mnt directory. 
+-c: Create an archive.		-v: Verbose output (optional, shows progress).
+-f: archive.tar: Saves the archive with the name archive.tar.
+    • tar -tvf archive.tar (List the contents of the archive without extracting)
+tar tf firstTar1.tar 
+    • tar -xvf archive.tar
+tar xf firstTar1.tar (To extract TAR files)
+    • Compress Files with gzip (reduce their size and appends a .gz extension.)
+gzip filename	(This replaces filename with filename.gz)
+gunzip filename.gz	(This restores filename.gz to its original state.)
+tar -czvf archive.tar.gz file1 file2 directory/	(-z: Compress the archive with gzip.)
+tar cvfz secTar.tar.gz output.txt output.log
+tar -czvf project.tar.gz project/		(Compress the project/ directory into a tar.gz file)
+tar -xzvf archive.tar.gz	(Extract a gzip-compressed tar Archive)
+    • tar cvfa secTar.tar.gz output.txt output.log (if we use cvfa , then based on tar.gz it will autocompress in gz mode). Multiple tar options are as below
+    • bzip2 is another compression tool, often resulting in higher compression ratios than gzip, and appends a .bz2 extension.
+    • bzip2 filename	(This replaces filename with filename.bz2.)
+    • bunzip2 filename.bz2		(This restores filename.bz2 to its original state.)
+    • tar -cjvf archive.tar.bz2 file1 file2 directory/	(-j: Compress the archive with bzip2.)
+    • tar -xjvf archive.tar.bz2	(Extract a bzip2-compressed tar Archive)
+    • use man tar for help
