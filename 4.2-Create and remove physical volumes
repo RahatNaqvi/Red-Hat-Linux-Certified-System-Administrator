@@ -1,0 +1,66 @@
+Creating Physical Volumes
+To create a physical volume, you must first have an unused disk or partition.
+Identify the Disk or Partition: 
+Lsblk		Use lsblk or fdisk to list available disks and partitions:
+Create a Physical Volume: sudo apt install lvm2  # For Debian/Ubuntu
+sudo pvcreate /dev/sdX Replace /dev/sdX with the disk (e.g., /dev/sdb).
+Verify the Physical Volume:
+Pvs	Use pvs or pvdisplay to verify the creation of the physical volume: 
+sudo pvdisplay /dev/sdX
+Removing Physical Volumes
+Before removing a physical volume, ensure it is not part of any volume group (VG) or that the volume group has been properly decommissioned.
+Deactivate the Physical Volume (if necessary):
+If the physical volume is in use, deactivate it using vgchange: 
+sudo vgchange -an [volume_group]	
+Replace [volume_group] with the name of the volume group.
+Remove the Physical Volume:
+sudo pvremove /dev/sdX
+This wipes the LVM metadata, making the disk available for other uses.
+Verify Removal:			pvs
+Check for Orphaned Physical Volumes: Orphaned physical volumes are not part of any volume group: 				sudo pvs | grep "orph"
+Multiple Physical Volumes: You can create a volume group from multiple PVs to pool their storage.		sudo vgcreate my_vg /dev/sdX /dev/sdY
+Remove Volume Group Before PV: Physical volumes must be removed from their volume groups before using pvremove.
+    • Backup Data, Check Dependencies: Ensure that the physical volume is not actively used by a volume group or logical volume before removal.
+    • LVM Elements are composed of:
+        1. Physical device
+        2. Physical volume
+        3. Volume group
+        4. Logical volume
+Virtual Data Optimizer (VDO) is a storage optimization feature primarily designed to enhance storage efficiency. It is part of the Logical Volume Manager (LVM) and is used for data deduplication and compression. It helps in reducing the amount of storage space needed by eliminating redundant data and compressing the stored data. VDO is particularly useful in environments where large amounts of data are stored, but much of it is duplicated, such as in virtualized or cloud environments. Install vdo
+After installation			lsbk			pvcreate /dev/nvm0n3			vgcreate VG1 /dev/nvm0n3			vgs
+Physical size has 1:10 to logical size usually (And is even allowed 256 times instead of 10 times and upper limits is 4 Petabytes :-D )
+nano /etc/fstab		At end add
+/dev/VG1/VDO1 /vdo_m xfs defaults 0 0
+mount -a
+Question: Create a vdo named V1 of size 50GB and mount at /V1
+Answer：Create the VDO Volume		
+vdo create --name=VD01 --device=/dev/nvme0n2 --vdoLogicalsize=50G
+mkfs.xfs /dev/mapper/VD01				Format the VDO Volume with a Filesystem
+mkdir VD01							Create the Mount Point	
+nano /etc/fstab			xxx
+/dev/mapper/VD01 /D0V1  xfs  defaults  0 0		OR
+/dev/mapper/VD01 /vdo1  auto defaults, x-systemd, requires=vdo.service  0 0	
+mount /dev/mapper/VD01 /VD01			Mount the VDO Volume
+vdo create --name=vdo_volume --device=/dev/sdX --size=100G
+ 			Mount –a				no error mean vdo is created		man vdo
+Question: Create a vdo named vdo1 of size 50GB and mount at vdo_m
+Create the VDO Volume: vdo create --name=vdo1 --device=/dev/vdb --vdoLogicalSize=50G
+Format the VDO Device:			mkfs.xfs /dev/mapper/vdo1
+Create the Mount Point:			mkdir /vdo_m
+Mount the VDO Volume:			mount /dev/mapper/vdo1 /vdo_m
+nano /etc/fstab
+/dev/mapper/vdo1   /vdo_m   xfs   defaults   0 0
+[root@localhost baljit]# lvcreate --type vdo --name VDO1 --size 5GB --virtualsize 50GB VG1
+  The VDO volume can address 2 GB in 1 data slab.
+  It can grow to address at most 16 TB of physical storage in 8192 slabs.
+  If a larger maximum size might be needed, use bigger slabs.
+  Logical volume "VDO1" created.
+[root@localhost baljit]# lsblk
+NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+nvme0n3         259:5    0   20G   0 disk
+└─VG1-vpool0    253:2    0    5G   0 lvm
+  └─VG1-VDO1    253:4    0   50G   0 vdo
+[root@localhost baljit]# mkfs.xfs -K /dev/VG1/VDO1
+meta-data=/dev/VG1/VDO1         isize=512    agcount=4, agsize=3276800 blks
+Question: Create of a VDO device named vdo0, with a 18 terabyte thinly-provisioned logical address size.
+vdo create --name=vdo0 --device=/dev/sdb1 --vdologicalSize=18T
