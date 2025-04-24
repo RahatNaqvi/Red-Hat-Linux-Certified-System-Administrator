@@ -1,0 +1,37 @@
+Identifying and terminating CPU or memory-intensive processes is a common task in system monitoring and management. Here's how to do it step by step:
+Identify CPU-Intensive Processes
+    • Using top Command: Open a terminal and type top. Press Enter. 
+The processes with the highest CPU/memory usage will appear at the top.
+    • Using htop Command: Install htop (if not installed sudo apt install htop): sudo apt install htop 
+Run htop in the terminal and sort by CPU or memory (press Shift + P). In the output, you will see a list of processes, including their PID, CPU usage, memory usage, and others. By default, processes are listed, and you can sort them by CPU usage by pressing F6 and selecting CPU.
+    • Using ps Command, you can use the ps command to identify CPU-intensive processes. For example:
+ps aux --sort=-%cpu | head -n 10 (Will show the top 10 processes sorted by CPU usage)
+Identify Memory-Intensive Processes:
+Same use of top and htop commands, In the top command output, press Shift + M to sort processes by memory usage. The most memory-intensive processes will appear at the top whereas in htop, press F6 and choose MEM% to sort processes by memory usage. Similarly, you can use:	ps aux --sort=-%mem | head -n 10
+This command will list the top 10 processes sorted by memory usage.
+Killing Processes: Kill Using top or htop
+While in top, find the PID of the process you want to kill. Press k (in top) to kill a process. Enter the PID of the process you want to kill and press Enter.
+You will be prompted to choose a signal. The default is SIGTERM (15), which gracefully terminates the process. If that doesn't work, you can send SIGKILL (9) to forcefully kill it.
+In htop, you can use the arrow keys to navigate to a process, press F9, and select the signal (SIGTERM or SIGKILL) to send.
+Before killing a process, you need to find its Process ID (PID) or name. find the PID as discussed above, 
+Using kill command:		kill <PID>		kill 12345
+By default, kill sends the SIGTERM signal, politely asking the process to terminate.
+To forcefully terminate:		kill -9 <PID> 		kill -9 12345
+This sends the SIGKILL signal, which immediately stops the process.
+Using pkill command:		pkill <process_name> 	pkill firefox
+Kills processes by name.
+To forcefully terminate:		pkill -9 <process_name>
+Using killall command:	killall <process_name>	killall firefox
+Terminates all processes with the specified name.
+Verifying Process Termination
+ps aux | grep <process_name>			pgrep <process_name>
+If no output appears, the process is terminated.
+Summary of Commands:
+            ▪ top: Real-time monitoring of processes.
+            ▪ htop: Improved version of top.
+            ▪ ps aux --sort=-%cpu: Sort processes by CPU usage.
+            ▪ ps aux --sort=-%mem: Sort processes by memory usage.
+            ▪ kill <PID>: Gracefully kill a process.
+            ▪ kill -9 <PID>: Force kill a process.
+            ▪ killall <process_name>: Kill processes by name.
+pkill <process_name>: Kill processes by name or other attributes.
