@@ -1,0 +1,12 @@
+In booting: when you press the power button, the system's BIOS or UEFI firmware initializes hardware components and finds a bootloader.
+The bootloader (e.g., GRUB) loads the Linux kernel into memory, and the kernel initializes system components, mounts the root filesystem, and starts the init or systemd process. Then the system launches user-space processes, enabling the user to log in and interact with the system.
+    • Sudo shutdown now		(Shut Down Immediately)
+    • Sudo shutdown +10		(Shutdown delay of 10 minutes)
+    • Sudo reboot				(Reboot Immediately)
+    • Sudo shutdown –r now		(Reboot with Shutdown Command)
+    • Sudo shutdown –r +5		(Restarts the system in 5 minutes)
+    • Sudo systemctl reboot		(Used for restart or rebooting the system but usually is applied on updates or configuration changes that require a reboot)	
+    • Sudo system ctl poweroff	(To turning off the machine after use)
+    • sudo journalctl -b			(View Logs for the Current Boot)
+    • sudo journalctl -b -1		(Replace -1 with -2, -3, etc., to view earlier boots)
+    • journalctl -r: Displays logs in reverse chronological order (newest first)
