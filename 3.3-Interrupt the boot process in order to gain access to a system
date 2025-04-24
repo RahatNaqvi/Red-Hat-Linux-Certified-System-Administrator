@@ -1,0 +1,59 @@
+It is useful for troubleshooting, recovery, or system maintenance, especially when you cannot log in normally (due to a forgotten password, system corruption, etc.). The process varies depending on the bootloader (e.g., GRUB), the operating system, and whether the system uses UEFI or BIOS. Below are the general steps for interrupting the boot process in a Linux system:
+    • Interrupting Boot Using GRUB (Common for Linux Systems)
+We use GRUB (Grand Unified Bootloader) to interrupt the boot process and modify boot parameters, or boot into a different runlevel or rescue mode.
+During Power on or reboot the system:
+    1. Hold the Shift key (on BIOS systems) or press Esc (on UEFI systems) right after the system starts. This will bring up the GRUB menu.
+    2. Once you see the GRUB menu, use the arrow keys to select the boot entry (usually the default kernel).
+    3. Press e to edit the boot parameters. Locate the line starting with linux or linux16.
+    4. Add one of the following to the end of the line:
+systemd.unit=rescue.target			(Rescue Mode) OR
+systemd.unit=emergency.target		(Emergency Mode)
+    5. Press Ctrl+X or F10 to boot with the modified parameters.
+    6. Once the system boots into a minimal environment (like rescue or emergency mode), you can troubleshoot or perform system recovery tasks.
+Gaining Access via Single-User Mode
+Follow the steps above to access the GRUB menu and edit the boot entry.
+Add the following to the kernel parameters line:
+single					Or				init=/bin/bash
+Boot the system - Press Ctrl+X or F10.
+You’ll gain a root shell for troubleshooting.
+Interrupting Boot via Recovery Mode
+If your system’s GRUB menu already has an option for "Recovery Mode," you can select it instead of editing the boot parameters manually. Use the arrow keys to select the recovery mode option. This typically appends single or rescue.target to the boot command and boots the system into a minimal recovery environment. Press Enter to boot into recovery mode, which will give you root access without requiring a password in many cases.
+Interrupting Boot for Password Reset (Single-User Mode)
+If you need to reset the root password or gain root access, you can modify the boot parameters: Follow above steps to edit the boot parameters.
+Add the following to the linux line:			init=/bin/bash
+Press Ctrl + X or F10 to boot. The system will boot to a shell prompt. At this point, you can change the password or perform other tasks. For example, to change the root password enter 		passwd
+Enter a new password when prompted, and then enter 		reboot
+After performing the necessary tasks, remount the filesystem with write access if needed:
+mount -o remount,rw /
+Reboot the system:		exec /sbin/init
+Question: reset root password to 12345
+Interrupt the Boot Process:
+Power on or restart your Linux machine. As the system begins to boot, you will typically see the GRUB boot loader menu. Use arrow and then e for edit
+    1. Edit the Boot Parameters:
+        ◦ Look for the line that starts with linux or linux16 (depending on your system). This line defines the kernel parameters.
+	Press END	 (after quite)		and write 	rd.break CTRL +X 	
+    2. Mount the Filesystem as Read/Write:
+        ◦ Once the system boots into a shell, you will be in a root shell but with a read-only filesystem.
+        ◦ To reset the root password, you first need to remount the root filesystem as read/write:
+        ◦ mount -o remount,rw /sysroot
+    3. Reset the Root Password: 
+        ◦ chroot /sysroot		(chroot is usefull to create test environment, recover system, password, and reinstall bootloader. Now you can change the root password. Use the passwd command:
+passwd root
+        ◦ You will be prompted to enter the new root password. Type 12345 (or your desired password) and press Enter.
+        ◦ Confirm the new password when prompted.
+        ◦ touch /.autorelabel (This is typically required if the SELinux contexts of the files or system have been changed)
+    4. Reboot the System:		You can use:		reboot
+    5. Log In with the New Root Password:
+Interrupting Boot via UEFI or Secure Boot (For UEFI Systems)
+Some systems with UEFI firmware or Secure Boot enabled may require additional steps to interrupt the boot process.
+When the system powers on, press the appropriate key to access the UEFI/BIOS setup (commonly F2, Esc, or Del). Disable Secure Boot temporarily (if enabled) to allow modifications to boot parameters. Save and exit the BIOS/UEFI. Follow the GRUB interruption steps described above.
+Using a Live CD/USB
+If the GRUB menu is password-protected or the above methods fail, you can boot from a live Linux distribution and can use a Live CD/USB to access the system’s files and perform repairs.
+Insert a Live CD/USB and reboot the system.
+Boot into the Live environment by selecting the appropriate boot device.
+Once in the Live environment, open a terminal.
+Mount the root filesystem of the installed system. For example:
+sudo mount /dev/sda1 /mnt (Replace /dev/sda1 with the correct partition for your system's root partition.)
+sudo chroot /mnt
+Perform your recovery tasks. e.g reset passwords or fix configuration issues.
+These methods allow you to interrupt the normal boot process and gain access to a system for troubleshooting or recovery tasks. Always proceed with caution when modifying boot parameters, especially on production systems.
