@@ -1,0 +1,42 @@
+Tuned is a daemon that optimizes the performance of a Linux system by adjusting system settings dynamically based on the use case or workload. It involves configuring system performance settings to optimize the system for specific workloads, such as high performance, low latency, or energy efficiency. Tools like tuned or cpupower help in managing and applying these profiles. Using tuned to Manage Tuning Profiles. Examples of profiles:
+    • Performance: Maximizes system performance.
+    • Powersave: Reduces power consumption.
+    • Throughput-performance: Optimizes for high I/O throughput.
+    • Latency-performance: Minimizes latency for real-time tasks.
+    • Virtual-host: Optimizes for virtualized environments.
+Installing tuned: For installation, 
+sudo apt install tuned		For Ubuntu	
+sudo yum install tuned  # For RHEL/CentOS
+Starting the tuned Service
+sudo systemctl start tuned
+sudo systemctl enable tuned or sudo systemctl enable --now tuned
+Listing Available Profiles:			tuned-adm list
+Applying a Profile:		sudo tuned-adm profile <profile_name>
+sudo tuned-adm profile performance
+Checking the Current Profile：		tuned-adm active
+Recommend a Profile: To let tuned recommend the best profile based on your system:								tuned-adm recommend
+Turn Off Tuning Profiles:				tuned-adm off
+Creating Custom Profiles
+    1. Navigate to the tuned directory			cd /etc/tuned
+    2. Create a new profile directory: 			sudo mkdir my_profile
+    3. Add a configuration file (tuned.conf) in the new directory: 	sudo nano /etc/tuned/my_profile/tuned.conf
+    4. [cpu]
+governor=performance
+[disk]
+elevator=deadline
+    5. Apply the custom profile: 		sudo tuned-adm profile my_profile
+
+Using cpupower for CPU-Specific Tuning
+Install cpupower:		Ensure cpupower is installed
+sudo apt install linux-tools-common linux-tools-generic  # Debian/Ubuntu
+sudo yum install cpupower  # RHEL/CentOS
+Adjust the CPU Governor: Set the CPU frequency scaling governor.
+sudo cpupower frequency-set -g <governor>
+sudo cpupower frequency-set -g performance
+Common governors:
+    • performance: Maximizes performance.
+    • powersave: Reduces power usage.
+    • ondemand: Adjusts frequency dynamically based on load.
+Check CPU Frequency Settings: 
+cpupower frequency-info
+To apply a specific profile or CPU governor at boot: Use tuned to ensure the profile is persistent. Alternatively, add commands to /etc/rc.local or systemd service files.
