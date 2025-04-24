@@ -1,0 +1,42 @@
+    • Conditionally execute code (use of: if, test, [], etc.)
+It allows a script to make decisions and execute specific blocks of code based on certain conditions.
+    • The if statement is used to execute code conditionally based on whether a test evaluates to true.
+    • The test command evaluates a condition and returns an exit status (0 for true, non-zero for false). The square brackets ([]) are a shorthand for the test command.
+test condition
+    • Using [] (Test Command Shorthand): Square brackets are commonly used for testing conditions. Ensure to leave spaces between the brackets and the condition.
+if [ $num -gt 5 ]; then
+    • Shell scripts support various types of conditions. File Conditions:
+-e file: File exists.	-d file: File is a directory.	-f file: File is a regular file.
+-r file: File is readable.	-w file: File is writable.	-x file: File is executable. 
+-s file: True if the file has non-zero size
+if [ -e /etc/passwd ]
+    • String Conditions:	[ -z string ]: True if string is empty.	
+[ -n string ]: True if string is not empty.	[ string1 = string2 ]: True if strings equal.
+[ string1 != string2 ]: True if strings unequal.
+    • if [ "$name" = "Alice" ]; then
+    • Numeric Conditions:
+-eq: Equal.		-ne: Not equal.		-lt: Less than.		-le: Less than or equal.
+-gt: Greater than.		-ge: Greater than or equal.
+if [ $num -gt 5 ]; then
+    • Combining Conditions
+if [ $num -gt 5 ] && [ $num -lt 15 ]; then		Example-1(Both conditions true)
+if [ $num -lt 5 ] || [ $num -gt 15 ]; then			Example-2(At least 1 condition true)
+    • Double Brackets ([[ ]]) for advanced pattern matching and safer comparisons
+if [[ $name == A* ]]; then
+    echo "The name starts with A"
+fi
+    • String Comparison
+Comparison				Expression
+True If strings are equal			String1 = String2
+True If strings are not equal		String1 != String2
+True If string is not null			-n string
+True if the string is null			-z string
+    • Arithmetic Comparison
+Comparison				Expression (exp)
+Equal to				exp1 -eq exp2
+Not equal to				exp1 -ne exp2
+Greater than				exp1-gt exp2
+Greater than or equal to		exp1 -ge exp2
+Less than				exp1 -It exp2
+Less than or equal to			exp1 -le exp2
+If expression is false				! exp
