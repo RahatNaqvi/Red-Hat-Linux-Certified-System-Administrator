@@ -1,0 +1,179 @@
+In Linux systems using systemd, targets are similar to runlevels in traditional init systems. A target defines a specific state or mode for the system (e.g., multi-user, graphical, rescue). You can boot the system into different targets manually by specifying the desired target during startup or while the system is running for various purposes like troubleshooting, system maintenance, or testing.
+    • Common systemd Targets
+Graphical Target (graphical.target)
+Full system startup with GUI									Runlevel 5.
+Multi-User Target (multi-user.target)
+Command-line mode with multi-user capabilities				Runlevel 3.
+Rescue Target (rescue.target)
+Single-user mode for troubleshooting or system recovery		Runlevel 1.
+Emergency Target (emergency.target)
+Minimal environment for debugging critical issues.		Starts a shell without network or most services.
+Poweroff Target (poweroff.target)					Shuts down the system.
+Reboot Target (reboot.target)						Restarts the system.
+    • You can switch between targets on a running system using the systemctl isolate command
+Switch to Multi-User Target (Command-Line Only):
+sudo systemctl isolate multi-user.target
+Switch to Graphical Target (GUI):
+sudo systemctl isolate graphical.target
+Enter Rescue Mode:
+sudo systemctl isolate rescue.target
+Enter Emergency Mode:
+sudo systemctl isolate emergency.target
+Each of these targets starts the system with a different set of services, so booting into a specific target is useful for different maintenance or operational task.
+Boot Into a Target Temporarily：To boot into a specific target for the current session (not permanent). 
+    • During the boot process, access the GRUB menu, Press and hold the Shift key (or Esc, depending on your system) while the system starts. 
+    • Select the desired boot entry and press e to edit it.
+    • Find the line starting with linux or linux16, and append the desired target name:
+    • systemd.unit=multi-user.target
+    • Press Ctrl+X or F10 to boot with the modified parameters.
+Booting into a Target Manually
+You can use the following commands to manually boot into different targets:
+Check the current target:			systemctl get-default
+Set a default target (Example (to set the graphical target):
+sudo systemctl set-default graphical.target
+Verify the change: 					systemctl get-default
+Boot into a specific target (without rebooting):
+sudo systemctl isolate <target-name>.target
+sudo systemctl isolate rescue.target
+Reboot into a target: To boot into a different target immediately upon reboot, you can edit the boot parameters (for example, using the GRUB bootloader).
+Run Levels (Traditional Init Systems)
+Run levels are a concept from older Unix and Linux systems that use the SysVinit or similar init systems. They define different states of system operation, such as multi-user mode, single-user mode, or graphical mode.
+Run Level
+Description
+0
+Halt (shutdown the system)
+1
+Single-user mode (for maintenance)
+2
+Multi-user mode without networking
+3
+Multi-user mode with networking
+4
+Undefined/Custom (rarely used)
+5
+Multi-user mode with networking and GUI
+6
+Reboot (restarts the system)
+    • who -r		(To check the current run level)
+    • sudo init 3		(To Change the run level (e.g., to run level 3))
+Systemd: It is the modern init system adopted by most Linux distributions. It introduces targets instead of run levels to define system states. Targets offer more flexibility and granularity compared to traditional run levels.
+Targets in Systemd: Systemd uses targets to achieve states similar to run levels. 
+Run Level
+Systemd Target
+Description
+0
+poweroff.target
+Halt (shutdown the system)
+1
+rescue.target
+Single-user mode
+2, 3, 4
+multi-user.target
+Multi-user mode without GUI
+5
+graphical.target
+Multi-user mode with GUI
+6
+reboot.target
+Reboot (restart the system)
+
+By default, Linux based systems boot on runlevel 3 or 5. However, user can modify preset runlevels and can create new ones according to the requirements.
+The init process is the first process started by the Linux kernel once it has completed its boot sequence. It has the PID of 1 and serves as the parent of all processes on the system. The primary responsibility of init is to initialize the user space and bring the system into its desired state by starting essential services and managing processes based on the configuration in the /etc/inittab file (used in traditional SysVinit systems).
+PID (Process Identifier) is a unique numeric identifier assigned by the operating system to each running process. It is used to track and manage processes in a Linux or Unix-based system. A daemon process is a background process that runs independently of user interaction and continues to operate until the system is shut down or the process is explicitly terminated.
+Init script are also called rc scripts (run command scripts)
+Terminal			init 3		converting to CLI
+Ubuntu 20.04.4 LTS bootcamp ttys
+bootcamp login: bobar
+Password:
+Welcome to Ubuntu 20.04.4 LTS (GNU/Linux 5.15.0-46-generic x86_64)
+* Documentation: https://help.ubuntu.com
+* Management:   https://landscape.canonical.com
+* Support:      https://ubuntu.com/advantage
+0 updates can be applied immediately.
+New release '22.04.1 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+Your Hardware Enablement Stack (HWE) is supported until April 2025.
+Last login: Tue Aug 23 15:38:04 PDT 2022 from 192.168.18.9 on pts/1
+bobar@bootcamp1:~$ sudo init 0
+[sudo] password for bobar:
+Then using init 5, converting back to GUI.
+Service is used as the basic bases whereas systemctl is more advanced.
+Check Service Status:	sudo service <service_name> status
+sudo service apache2 status
+Start a Service:			sudo service <service_name> start
+sudo service mysql start
+Stop a Service:			sudo service <service_name> stop
+sudo service ssh stop		service apache2 stop
+Restart a Service:		sudo service <service_name> restart
+sudo service nginx restart
+Reload a Service: (Used to apply configuration changes without stopping the service)
+sudo service <service_name> reload
+sudo service apache2 reload
+    • Start a service				systemctl start [service-name] 
+systemctl start apache2
+    • Restart a service (whether running or not)		
+sudo systemctl restart <service_name>	sudo systemctl restart apache2
+    • Restart a service if already running 
+systemctl condrestart [service-name] 
+    • Enable a service at startup	
+sudo systemctl enable <service_name>	sudo systemctl enable nginx
+ls –l | grep apache2	Here it will enable as well as will tell the path
+    • Disable a service at startup	
+sudo systemctl disable <service_name>	sudo systemctl disable mysql
+    • Check if a service is enabled at startup sudo systemctl is-enabled <service_name>
+systemctl is-enabled apache2
+    • See all services (running or not)		systemctl list-units --type service --all 
+    • Stop a service		systemctl stop [service-name] 
+    • reload a service			systemctl reload [service-name]			systemctl reload apache2
+    • See service status			systemctl status [service-name]
+systemctl status apachi2
+    • systemctl halt
+    • systemctl poweroff
+    • systemctl reboot 
+    • Create new serivce file or modify configuration
+systemctl daemon-reload
+Create a new service (you need to create/define a Systemd unit file)
+    1. sudo nano /etc/systemd/system/myapp.service
+    2. Define the Service: Add the following content as a template:
+[Unit]
+Description=My Python App
+After=network.target
+[Service]
+ExecStart=/usr/bin/python3 /home/user/myapp.py
+Restart=always
+User=user
+Group=user
+[Install]
+WantedBy=multi-user.target
+    3. Save and Reload Systemd: Reload Systemd to recognize the new service:
+sudo systemctl daemon-reload
+sudo systemctl start myapp
+sudo systemctl enable myapp
+    4. Start and Enable the Service:
+sudo systemctl start <service_name>
+sudo systemctl enable <service_name>
+    • Modify an existing service configuration	
+sudo nano /etc/systemd/system/<service_name>.service (After modification, sudo systemctl restart <service_name>)
+    • Reload Systemd after changes			sudo systemctl daemon-reload
+Systemd is a system and service manager for Linux operating systems. It serves as an init system to bootstrap the user space and manage processes. It offers parallelization capabilities, maintains process control groups (cgroups), and provides robust service management, logging, and configuration tools. It continuously monitors and manages system services.
+Systemd is both a system manager (Controls overall system states (runlevels, targets, etc.) and a service manager (Manages individual services, sockets, and other units)
+Systemd provides/manages efficient tools like systemctl boot, enable etc. 
+Key Systemd Tools are:
+    • systemctl: control system and services
+    • journalctl: manage journal, systemd's logging system 
+    • hostnamectl: control hostname
+    • localectl: configure locale and keyboard layout 
+    • timedatectl: set time and date
+    • systemd-cgls: shows cgroup contents
+    • systemadm: front-end for systemctl
+A complete cycle is as below
+    • sudo systemctl enable apache2
+    • ls -1 | grep apache2
+    • pwd		(/etc/systemd/system/multi-user.target.wants)
+    • sudo systemctl disable apache2
+    • ls -l I grep apache2		(Will show nothing)
+    • sudo systemctl enable apache2
+    • ls -1 | grep apache2
+    • sudo systemctl daenon-reload 
+    • sudo systemctl halt
+    • sudo bash		init 6 (For Rebooting)
