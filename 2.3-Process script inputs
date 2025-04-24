@@ -1,0 +1,107 @@
+In Linux, script inputs like $1, $2, etc., are called positional parameters that allow you to pass arguments to a script when running it.  $0: The name of the script itself.
+    • $1: The first argument.			$2: The second argument.
+./script.sh arg1 arg2 arg3		
+    • echo "Hello $1, you are $2 years old!"
+03-Processscriptinputs($1,$2).sh
+for x in 12 qwe tyu
+do
+    touch $x
+    echo "File created"
+done
+chmod u+x for1.sh			./for1.sh
+What it does:
+    1. Loop through values: The for loop iterates over the list 12, qwe, and tyu.
+    2. Create a file: touch $x creates a file with the current value of $x (so: 12, qwe, and tyu).
+    3. Echo message: It prints "File created" after each file is made.
+    4 Files created 12, qwe, tyu
+
+Next is # print date and time 10 times, once after each second
+for ((i=0; i<10; i++))
+do
+    date
+    sleep 1
+done
+What it does:
+    1. for ((i=0; i<10; i++))
+        ◦ Initializes i=0,	Loops while i is less than 10, Increments i by 1 after every loop
+    2. Date:	Prints the current date and time
+    3. sleep 1:	Pauses for 1 second before the next iteration
+Output: Tue Apr 23 12:00:01 PKT 2025
+Tue Apr 23 12:00:02 PKT 2025
+(prints 10 times, 1-second gap between each)
+Question: Write a shell script to count the number of file names passed at command line
+count=0                     # Initialize file counter
+
+for x in $*                 # Loop through all command-line arguments
+do
+    if [ -f $x ]            # Check if the argument is a regular file
+    then
+        count=$(($count+1)) # Increment the counter if it's a file
+    fi
+done
+echo "Total file names were: $count"
+Example usage:		./script.sh file1.txt file2.txt folder1 someOtherFile
+If only file1.txt and file2.txt are real files, the output will be:	Total file names were: 2
+Question：Write a shell script to check if the present month is October or not?
+x=$(date +"%m")
+if [ $x -eq 10 ]
+then
+    echo "month is october"
+else
+    echo "Not"
+fi
+Question：Write a shell script to count the number of files having read permission in the current working directory
+count=0
+for x in *
+do
+    if [ -f $x ] && [ -r $x ]
+    then
+        count=$(($count+1))
+    fi
+done
+echo "Total files having read permission are $count"
+Question： Write a shell script to check if the current user is the root user or not?
+Q3.sh
+x=$(whoami)
+if [ $x = "root" ]
+then
+    echo "you are root"
+else
+    echo "you are a regular user"
+fi
+Question: Write a shell script to print long list of all the file names passed at command line.
+#!/bin/bash
+for file in "$@"
+do
+  ls -l "$file"
+done 
+Question: Write a script to check the total arguments passed at command line. If the arguments are more than 3 then list the arguments else print "type more next time”
+#!/bin/bash
+If [ $# -gt 3 ]
+then
+echo "The arguments were $*"
+else
+echo “Type more next time”
+fi
+Question: Write a shell script to copy a file into a directory. The file name is passed as first argument and the directory name is passed as second argument?
+cp $1 $2
+echo “file copied”
+run it like			 ./copy_file.sh file.txt /some/folder
+Question: "Write a shell script that creates empty files for each argument passed at the command line and prints a confirmation message for each file created."
+for x in $*
+do
+    touch $x
+    echo "$x file created"
+done
+if you ran this script like ./script.sh file1 file2 file3, it would create three empty files named "file1", "file2", and "file3"
+Question: Create a shell script that processes multiple command line arguments, showing long format listings for valid files and error messages for non-existent files.
+for x in $*
+do
+    if [ -f $x ]
+    then
+        ls -l $x
+    else
+        echo "$x is not a file"
+    fi
+done
+if you run ./for4.sh file1.txt nonexistent.txt directory1, it would Show detailed information for file1.txt (if it exists) , Print "nonexistent.txt is not a file" (assuming this file doesn't exist) &  Print "directory1 is not a file" (if directory1 is a directory, not a regular file).
