@@ -1,0 +1,28 @@
+This is typically done using systemctl, which interacts with systemd to control services. Here's how to manage network services:
+Starting a Network Service
+sudo systemctl start [service_name]
+Example: 		sudo systemctl start sshd
+Stopping a Network Service
+sudo systemctl stop [service_name]
+Example:		sudo systemctl stop sshd
+Restarting a Network Service
+sudo systemctl restart [service_name]
+sudo systemctl restart sshd
+Reloading a Network Service
+sudo systemctl reload [service_name]
+sudo systemctl reload apache2
+Checking the Status of a Network Service
+systemctl status [service_name]
+systemctl status sshd
+Enabling and Disabling Services at Boot
+sudo systemctl enable [service_name]
+sudo systemctl disable [service_name]
+Listing All Services
+systemctl list-units --type=service
+Example: Managing the Network Manager Service
+Start Network Manager: 
+sudo systemctl start NetworkManager
+Stop Network Manager: 
+sudo systemctl stop NetworkManager
+Check Network Manager Status: 
+systemctl status NetworkManager
