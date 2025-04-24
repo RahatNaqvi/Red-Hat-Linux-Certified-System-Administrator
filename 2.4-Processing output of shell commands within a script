@@ -1,0 +1,165 @@
+In shell scripts, you can process the output of commands using command substitution or pipelines. Example: This bash script uses the date command to capture and display both the complete current date and time as well as just the day of the week.
+#!/bin/bash
+current_datetime=$(date)					# Get the current date and time
+echo "Current Date and Time: $current_datetime"		# Print the current date and time
+day_of_week=$(date +%A)					# Extract the day of the week
+echo "Today is: $day_of_week"					# Print the day of the week
+Another program
+#!/bin/bash
+ls 
+date
+cal
+echo “This is the last command)	
+Question: Write a bash script that prints the word 'hello' exactly 10 times using a C-style for loop
+for((i=1;i<=10;i++))
+do
+  echo "hello"
+done
+The shebang (#!) is the character sequence at the beginning of a script file that tells the operating system which interpreter to use to execute the script.
+Local variable: When you run a shell command and want to capture its output for processing within your script, you typically store that output in a local variable.
+var1=20
+var2=baljit
+var3="baljit singh"
+var4=20.4
+var5=3+3
+echo $var1
+echo $var2
+echo $var3
+echo $var4
+echo $var5
+Another example is:
+file_count=$(ls -l | wc -l)  # Store command output in a variable
+echo "Number of files: $file_count"
+Environment variables are key-value pairs used by the operating system and shell to pass configuration and information to processes and scripts.
+They are like global variables available to your shell session, programs, and scripts.
+Example: 
+export NAME="John"
+echo $NAME
+Question: Write a shell script to create 2 directories. The name of directories will be passed by the user.
+Echo “Enter the 2 directories names”
+read dir1 dir2
+mkdir $dir1 $dir2
+echo “Directories created”
+Check system information using Environment variables
+echo "the home directory of the user is : $HOME"
+echo "the default shell : $SHELL"
+Command Line Arguments and Positional Variables: When you run a script and pass values after the script name, those values are command line arguments. Command Line Arguments and Positional Variables are closely related but not the same.
+#!/bin/bash
+echo "Script name: $0"
+echo "First arg: $1"
+echo "Second arg: $2"
+Positional Variables: also called positional parameters, are special variables in shell scripting used to access the arguments passed to a script, based on their position.
+How They Work: When you run a shell script and pass arguments, the shell stores each argument in a numbered variable.
+Variable
+Meaning
+$0
+Name of the script itself
+$1
+First argument
+$2
+Second argument
+$3, $4, ...
+Third, fourth, etc. argument
+$#
+Total number of arguments
+$@
+All arguments (as a list)
+$*
+All arguments (as a single string)
+#!/bin/bash
+echo "Hello $1!"
+echo "You are from $2."
+./greet.sh Alice Canada
+Output:		Hello Alice!		You are from Canada.
+Question: Write a script to rename a file. The old name and the new name must be passed at command line
+echo "Enter the old filename:"
+read old_filename
+echo "Enter the new filename:"
+read new_filename
+mv "$old_filename" "$new_filename"
+echo "File renamed successfully from $old_filename to $new_filename"
+Question: Rename a file name on input
+mv $1 $2
+echo “Name updated”
+./name.sh oldname newname
+Question: create a file name on input?
+touch $1 $2
+echo "Name updated"
+Question: check if the number entered by the user is greater than 10?
+echo "Enter the number"
+read number
+if [ $number -gt 10 ]
+then
+   echo "Well done"
+else
+   echo "number is small"
+fi
+Question: write a script to check if a file exist. If not, then create it.
+echo "Enter the name of a file"
+read name
+if [ -f $name ]
+then
+   echo "file exist"
+else
+   touch $name
+fi
+Question: write a shell script to read a month name from the user. Check if the name entered is either august or October?
+#!/bin/bash
+echo "Enter a month name:"
+read month
+if [ "$month" = "August" ] || [ "$month" = "October" ]; then
+    echo "You entered a valid month: $month"
+else
+    echo "The month is not August or October"
+fi
+Question: Write a shell script which checks the total number of argumnets passed. If the arguments count is >5, display the message “Too many arguments”
+#!/bin/bash
+# Check number of arguments
+if [ $# -gt 5 ]; then
+    echo "Too many arguments"
+else
+    echo "Argument count is fine"
+fi
+Question: Write a shell script which checks the total number of argumnets passed and each argument
+touch $1 $2
+echo “File creates”
+echo “Total arguments passed are: $#”
+echo “Each argument value is $*”
+./myscript.sh file1.txt file2.txt file3.txt
+File creates	Total arguments passed are: 3	Each argument value is file1.txt file2.txt file3.txt
+Question: Write a script that takes two commands line argument. Check whether the name passed as first argument is a directory or not? If not, then create a new directory wih the name passed as second argument
+if [ -f $1 ]
+then
+   echo "Directory exists"
+else
+   mkdir $2
+   echo "Directory created"
+fi
+Question: Write a script that checks if the argument passed at command line is whether a file or directory?
+Shell Script Tutorial for Beginners - Part 4 || if-else || Comparison Op
+if [ -f $1]
+then
+  echo "name is of a file"
+elif [ -d $1]
+then
+  echo "name is of a directory"
+else
+  echo "Neither file nor directory exists"
+fi
+./if_file.sh 1234 DIR
+Output: Name is a file				name is a directory
+Question: Write a shell script that checks if a given argument (filename or directory name) exists, and prints "Exists" or "Does not exist" accordingly.
+if [ -f $1] | [ -d $1] |
+then
+  echo "Entry exist"
+else
+  echo "No such entry"
+fi
+Question: Write a shell script that the entry is file or directory passed on argument.
+if [ -f "$1" ]; then
+  echo "name is of a file"
+elif [ -d "$1" ]; then
+  echo "name is of a directory"
+else
+  echo "Neither file nor directory exists"
+fi
