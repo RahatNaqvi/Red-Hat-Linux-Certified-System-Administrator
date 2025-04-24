@@ -1,0 +1,57 @@
+Adjusting process scheduling in Linux involves modifying the priority and scheduling policy of processes to control how the CPU allocates time to them. This is often done to improve performance or ensure critical tasks get the required resources. Linux uses the CFS (Completely Fair Scheduler) for general process scheduling and provides various methods for adjusting process priority and scheduling.
+Priorities and Nice Values:
+Priority: Determines how much CPU time a process gets relative to others. Lower values indicate higher priority.
+Nice Value: A user-modifiable value that affects the priority.
+Range: -20 (highest priority) to 19 (lowest priority).
+Default value: 0.
+Scheduling Policies: Linux supports multiple scheduling policies, including:
+    • SCHED_OTHER: Default time-sharing policy.
+    • SCHED_FIFO: First-In-First-Out, real-time scheduling.
+    • SCHED_RR: Round-Robin, real-time scheduling.
+    • SCHED_IDLE: For very low-priority tasks.
+    • SCHED_BATCH: For batch processing.
+Commands for Adjusting Scheduling
+Check the current nice value of a process:
+ps -eo pid,comm,nice
+This will show the PID, command, and nice value of all running processes。
+nice: Start a process with a specific nice value.
+nice -n <value> <command>			nice -n 10 ./my_program
+E.g., Start a process with low CPU priority:		nice -n 10 ./long_task
+nice -n -10 sleep 100  (This starts the sleep command with a nice value of -10)
+renice: Change the nice value of a running process.
+renice <value> -p <PID>				renice -5 -p 1234
+E.g., Change a running process to high priority:		renice -10 -p 2345
+This sets the nice value of process with PID 2345 to -10, giving it higher priority.
+chrt: Set or change the scheduling policy and priority of a process.
+Start a process with a specific policy:
+chrt -f <priority> <command>  # FIFO (First-In, First-Out) policy. Priority ranges from 1 (highest) to 99 (lowest), with higher values having higher priority.
+chrt -r <priority> <command>  # Round-robin policy	chrt -r 20 myprogram
+E.g., Set a real-time priority for a critical process:	
+chrt -f 10 ./critical_task
+Modify an existing process:
+chrt -p <priority> <PID>			chrt -p 1234
+chrt -f 10 -p 1234
+This shows the scheduling policy and priority of the process with PID 1234
+ionice: Adjust I/O scheduling for processes (disk access priority).
+Start a process:		ionice -c <class> -n <priority> <command>
+            ▪ Class 1: Real-time (highest priority).
+            ▪ Class 2: Best-effort (default).
+            ▪ Class 3: Idle (lowest priority).
+Change an existing process:		ionice -c <class> -n <priority> -p <PID>
+E.g., Set a low I/O priority for a background job:	ionice -c 3 ./backup_script
+Impact: Be cautious when prioritizing processes. A poorly adjusted high-priority process can starve others and degrade system performance.
+Setting CPU Affinity (Binding a Process to a Specific CPU Core)
+You can control on which CPU core a process runs by adjusting its CPU affinity. This is useful when you want to improve performance by restricting a process to run only on certain cores, reducing context switching and cache misses.
+Check the current CPU affinity of a process:
+taskset -p <PID>				taskset -p 1234
+This shows which CPUs the process with PID 1234 can run on.
+Set CPU affinity for a process: To bind a process to CPU core 0:
+taskset -c 0 <command>
+To bind a process to multiple cores (e.g., cores 0 and 1):
+taskset -c 0,1 <command>
+Or to bind a process to all cores:			taskset -c 0-3 <command>
+Change the CPU affinity of an existing process:
+sudo taskset -p <bitmask> <PID>		sudo taskset -p 0x3 1234
+For example, to bind the process with PID 1234 to CPU cores 0 and 1:
+Other Tools for Process Scheduling
+schedtool: This command can be used to set the CPU scheduling policy and priorities of running processes, including support for both real-time and normal tasks.
