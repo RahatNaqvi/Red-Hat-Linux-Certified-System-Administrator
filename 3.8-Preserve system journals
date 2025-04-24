@@ -1,0 +1,26 @@
+Preserving system journals ensures that critical system logs are saved for future reference, troubleshooting, and compliance. To preserve system journals in Linux, you need to configure systemd-journald to store logs persistently on disk rather than only in volatile memory. Here are the steps to achieve this:
+Create the Journal Directory: Storage for journal logs is located in /var/log/journal/. If this directory does not exist, you need to create it: 
+sudo mkdir -p /var/log/journal
+Set Correct Permissions: Directory should have correct permissions.
+sudo systemd-tmpfiles --create --prefix /var/log/journal
+Configure systemd-journald: Edit the journald configuration file to enable persistent logging: 		sudo nano /etc/systemd/journald.conf
+Look for the line that starts with Storage= and set it to persistent: 
+[Journal]
+Storage=persistent
+If the Storage= line is commented out, remove the # and update its value.
+Restart systemd-journald: After making changes to the configuration, restart the systemd-journald service to apply them: 	sudo systemctl restart systemd-journald
+Verify Persistence: After a reboot, check if the logs are being stored persistently: 						journalctl --disk-usage
+If logs are preserved after rebooting, the persistent storage is working.
+Optional Configurations:
+Limit Disk Usage: You can configure limits to control the amount of disk space used by the journal: 
+    • SystemMaxUse=: Maximum disk space that journal logs can use.
+    • SystemKeepFree=: Amount of disk space to keep free for other uses.
+    • SystemMaxFileSize=: Maximum size of individual journal files.
+These options can be set in:			/etc/systemd/journald.conf.
+Example Configuration:
+[Journal]
+Storage=persistent
+SystemMaxUse=500M
+SystemKeepFree=100M
+SystemMaxFileSize=50M
+By following these steps, system journals will be preserved across reboots.
