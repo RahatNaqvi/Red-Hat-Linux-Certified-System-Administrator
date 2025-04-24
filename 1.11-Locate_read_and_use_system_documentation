@@ -1,0 +1,16 @@
+    • System documentation is a key resource for understanding and using software
+    • man ls	(Press n to move to the next match and N to move to the previous match.)
+man <section> <command>		(Specify section to locate specific content)
+man 5 crontab	
+    • info <command-name>	info provides more structured documentation than man
+    • command –help		ls –help
+    • whatis --ls
+    • The /usr/share/doc directory contains documentation files provided by installed packages. These files include:
+README files.		Changelogs.		License information.	Sample config files.
+    • Locate documentation: Navigate to the directory:
+cd /usr/share/doc		List available packages:		ls
+    • Read documentation: Use tools like cat, less, or nano to read files
+less /usr/share/doc/<package-name>/README
+less /usr/share/doc/bash/README
+    • Searching for specific content: Use grep to find specific information:
+grep "keyword" /usr/share/doc/<package-name>/*
