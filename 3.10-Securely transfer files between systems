@@ -1,0 +1,36 @@
+Using scp (Secure Copy Protocol): It uses SSH to transfer files securely.
+scp [options] source_file [user@]destination_host:destination_path
+    • Transfer a file to a remote server: 
+scp file.txt user@remote_host:/path/to/destination
+    • Transfer a file from a remote server to the local system: 
+scp user@remote_host:/path/to/file.txt /local/path
+-r: Recursively copy directories, and -P [port]: Specify a custom SSH port.
+Using rsync: Tool for copying and synchronizing files locally and remotely over SSH.
+rsync [options] source [user@]destination_host:destination
+    • Synchronize a directory to a remote server: 
+    • rsync -avz /local/directory/ user@remote_host:/remote/directory/
+Common Options:
+    • -a: Archive mode (preserves symbolic links, permissions, etc.).
+    • -v: Verbose mode.
+    • -z: Compress data during the transfer.
+    • -e ssh: Use SSH for data transfer.
+Using sftp (SSH File Transfer): File transfer similar to FTP but uses SSH for encryption.
+sftp [user@]host
+    • Connect to a remote server: 
+    • sftp user@remote_host
+    • Once connected, use commands like get and put to download and upload files, respectively.
+Using sshfs (SSH File System): Allows you to mount a remote filesystem over SSH and interact with it as if it were local.
+sshfs [user@]host:/remote/directory /local/mount/point
+    • Mount a remote directory: 
+    • sshfs user@remote_host:/remote/path /local/mount
+Unmounting:
+fusermount -u /local/mount
+Using scp with Key-based Authentication: To avoid password prompts and increase security, set up SSH key-based authentication: 
+        1. Generate a key pair on the local machine: 
+        2. ssh-keygen -t rsa -b 4096
+        3. Copy the public key to the remote server: 
+        4. ssh-copy-id user@remote_host
+        5. Now, you can use scp, rsync, or sftp without entering a password.
+ Using tar with ssh for Large Transfers: To transfer large directories efficiently.
+    • Compress and transfer a directory: 
+    • tar czf - /local/directory | ssh user@remote_host "tar xzf - -C /remote/directory"
