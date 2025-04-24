@@ -1,0 +1,17 @@
+Looping constructs like for, while, and until are essential for automating repetitive tasks. They allow you to process files as command-line inputs, or outputs of commands, and directory.
+    • for		Iterating over a list of items, files, or arguments.
+When you run a shell script, you can pass arguments to it. A for loop helps process each argument. 
+./script.sh file1.txt file2.txt file3.txt
+You can use for to process all files in a folder. 
+    • while	Repeating until a specific condition is false. 
+If you want to process each line of a file, use a while loop.
+A while loop can process numbers or repeat a task a specific number of times.
+    • Until		Repeating until a specific condition is true.
+    • Combining Loops with Command Output: Use loops to process the output of commands.
+for user in $(cut -d: -f1 /etc/passwd); do (cut extracts usernames from the file)
+    • Using for to Perform Operations on Multiple Files: Combine for with commands to perform actions on files.
+for file in *.txt; do
+    echo "Processing $file"
+    wc -l "$file"  # Count the number of lines in the file
+The *.txt matches all .txt files and the wc -l command counts lines in each file.
+    • Combining Conditions with Loops: Combine loops with conditions to handle specific cases.
