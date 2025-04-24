@@ -1,0 +1,158 @@
+System log files and journals in Linux provide crucial information about system activities, errors, and events. These logs are invaluable for troubleshooting and monitoring. Here’s how to locate and interpret them:
+1. System Logs Location
+Traditional Log Files (Text-Based): Most log files are stored in /var/log/. Common log files include:
+        ◦ System Log (/var/log/syslog or /var/log/messages):
+            ▪ Contains general system activity including startup messages.
+            ▪ Used for debugging or reviewing system events.
+            ▪ sudo tail -f /var/log/syslog  # For Debian/Ubuntu
+            ▪ sudo tail -f /var/log/messages  # For RHEL/CentOS
+        ◦ Authentication Log (/var/log/auth.log or /var/log/secure):
+            ▪ Logs authentication store all security-related events such as logins, root user actions, & output from pluggable authentication modules (PAM).
+            ▪ sudo cat /var/log/auth.log  # Debian/Ubuntu
+            ▪ sudo cat /var/log/secure  # RHEL/CentOS
+cat auth.log	An SSH server log showing login attempts to a server 
+Aug 30 15:16:21 mtcrokBs-demo sshd[274416]: Invalid user testftp from 114.111.1.247 port 40688
+Aug 30 15:16:21 mtcrokBs-demo sshd[274416]: Connection closed by invalid user testftp 114.111.1.247 port 40688 [preauth]
+Aug 30 15:16:23 mtcrokBs-demo sshd[274396]: Invalid user rabbit from 114.111.1.247 port 40672
+Aug 30 15:16:23 mtcrokBs-demo sshd[274396]: Connection closed by invalid user rabbit 114.111.1.247 port 40672 [preauth]
+Aug 30 15:16:24 mtcrokBs-demo sshd[274381]: Invalid user test from 114.111.1.247 port 40662
+Aug 30 15:16:24 mtcrokBs-demo sshd[274381]: Connection closed by invalid user test 114.111.1.247 port 40662 [preauth]
+Aug 30 15:16:28 mtcrokBs-demo sshd[274415]: Invalid user demo from 114.111.1.247 port 40712
+Aug 30 15:16:28 mtcrokBs-demo sshd[274417]: Invalid user svpliot from 114.111.1.247 port 40664
+Aug 30 15:42:31 mtcrokBs-demo sshd[302149]: Received disconnect from 157.230.32.156 port 35652:11: Bye Bye [preauth]
+Aug 30 15:42:31 mtcrokBs-demo sshd[302149]: Disconnected from invalid user tfpuser 157.230.32.156 port 35652 [preauth]
+        ◦ Kernel Log (/var/log/kern.log or var/log/dmesg:): stores kernel events, errors, and warning logs, which are particularly helpful for troubleshooting custom kernels at boot time and in normal operation. If having issues with something during bootup or hardware issue, dmesg is the best to look at.
+            ▪ Logs kernel messages (hardware issues, drivers).
+            ▪ sudo tail -f /var/log/kern.log
+            ▪ dmesg -T: Shows timestamps for each log entry (The dmesg command is used to print the kernel ring buffer messages, which can include boot-time logs, hardware events, and driver messages.)
+            ▪ dmesg --level=err,warn: Filters output to show only error and warning messages (The --level option filters the dmesg output by severity levels.)
+            ▪ dmesg | grep [keyword]: Filters logs by specific keywords e.g. dmesg | grep usb
+            ▪ cat /var/log/kern.log: Displays the contents of the log.
+            ▪ tail -f /var/log/kern.log: Continuously monitors the log for new entries, useful for real-time troubleshooting.
+            ▪ Cd /var/log				ls		ls -al		
+cat dmesg			It will show all the information of services
+cat kern.log			sudo apt install apache2 
+systemctl status apache2		active required
+    1. cd journal/ 		typically found in /var/log/journal/.		ls 
+    2. journalctl --list-boots - Display a list of recorded boot sessions with their IDs, timestamps, and durations, helping you identify which boot session you want to examine.
+    3. journalctl -b - Show all journal entries from the current boot session. 
+    4. journalctl --since "1 hour ago" - Display only journal entries from the past hour.
+    5. journalctl -f 		-showing new entries as they arrive. This is like having a live view of system events.
+    6. journalctl -u ssh.service -f - Follow only the SSH service logs in real-time. This is particularly useful when you're monitoring SSH connection issues.
+    7. tail -f apache2/access.log - Follow the Apache web server access logs in real-time to monitor HTTP requests, useful for tracking web traffic or diagnosing website issues.
+    8. tail -f kern.log - Follow the kernel log in real-time to monitor low-level system events and hardware interactions, useful for troubleshooting hardware or driver issues.
+journalctl -b -1 -p "emerg".."crit" - Shows emergency to critical priority logs from the previous boot (-1). 
+journalctl -b -0 -p "emerg".."crit" - Shows emergency to critical priority logs from the current boot (-0). 
+journalctl -b -p "emerg".."crit" - Shows emergency to critical priority logs from the current boot (default). 
+journalctl -b 0 -p "emerg".."crit" - Shows emergency to critical priority logs from the current boot (explicitly specified as 0).
+        ◦ Boot Log (/var/log/boot.log):
+            ▪ Logs messages related to system startup.
+            ▪ sudo cat /var/log/boot.log
+        ◦ Application Logs:
+            ▪ Many applications have their own logs in /var/log/, e.g.: 
+                • Apache: /var/log/apache2/ (Debian/Ubuntu) or /var/log/httpd/ (RHEL/CentOS).
+                • MySQL: /var/log/mysql/.
+                • Scheduled tasks (Cron jobs): /var/log/cron 
+Use this data to verify that your cron jobs are running successfully.
+    • Systemd Journal: The journalctl command is used to view logs from the systemd journal.
+Viewing and Interpreting Logs
+View the entire log: 				cat /var/log/syslog
+View the last few lines: 			tail /var/log/syslog
+Follow real-time updates: 			tail -f /var/log/syslog
+Scroll through the log: 			less /var/log/syslog
+Using journalctl for Systemd Logs
+View all logs: 					journalctl
+View the kernel log: 				journalctl -k
+View logs for a specific service: 	journalctl -u <service_name>
+journalctl -u sshd
+View recent logs: 				journalctl -r
+Follow real-time updates: 			journalctl -f
+Exporting Log :					journalctl > logs.txt
+Filtering Logs
+Logs by date and time:	journalctl --since "2025-01-01" --until "2025-01-02"
+sudo journalctl --since "1 hour ago"  # Logs from the last hour
+Logs by priority:			journalctl -p <priority>
+Priority levels:		0: Emergency		1: Alert		2: Critical		3: Error					4: Warning		5: Notice		6: Informational	7: Debug
+journalctl -p 3  # Show errors only
+Analyzing Logs for Specific Events
+Search for specific keywords in a log: 
+grep <keyword> /var/log/syslog			grep "error" /var/log/syslog
+Log Rotation
+Log files can grow large over time. Linux uses logrotate to manage log rotation:
+Configurations are found in /etc/logrotate.conf or /etc/logrotate.d/.
+Rotated logs have extensions like .1, .2.gz. 
+Permissions
+Log files typically require root permissions.		sudo cat /var/log/auth.log
+Examples of Common Log Issues
+    • Authentication failures: Check /var/log/auth.log or /var/log/secure.
+Use command grep "Failed password" /var/log/auth.log
+    • System boot issues: Check /var/log/boot.log or journalctl -b.
+    • Application crashes: Look in /var/log/<application> or filter with journalctl -u.
+System Log： The syslog service and protocol provide a standardized way to collect and transmit log messages across systems. It receives and processes syslog messages, and listens for events via a socket located at /dev/log, where applications write their log messages, and as an output, can write messages to local files or forward them to remote syslog servers for central logging.
+Its common implementations include: 
+            ▪ rsyslogd: A more feature-rich and modular implementation.
+            ▪ Syslog-ng: Known for its flexibility and extended capabilities.
+The purpose of Syslog Protocol (RFC5424) is to defines how logs are transmitted over a network and the structure of messages. It uses port 514 for plaintext messages and 6514 for encrypted messages.
+A syslog message generally includes: Priority (severity and facility), Timestamp (when the event occurred), Hostname (source of the message), App-name (the application sending the log) and Message content (log details).
+Syslog messages follow a structured format that enables consistent logging across different systems and applications. A standardized header includes
+1. **Priority (PRI)**: Encoded value that combines the facility and severity of the message.
+2. **Timestamp**: Indicates when the message was logged.
+3. **Hostname**: The name of the device or application that generated the message.
+4. **Application Name**: The specific application or process that created the log entry.
+5. **Message**: Contains the actual content of the log, which may include error details, status updates, or other relevant information.
+A typical Syslog message might look like this:
+<PRI>TIMESTAMP HOSTNAME APP-NAME [LOCATION] MESSAGE
+Each part plays a crucial role in identifying, sorting, and responding to log events in a systematic way.
+default sshd daemon format	(Typical format used by the sshd daemon to log events)
+Jun 4 22:14:15 server1 sshd[41458]: Failed password for root from 10.0.2.2 port 22 ssh2
+Timestamp of event occurrence, hostname of the server, application name (sshd), process ID (41458) in square brackets, message content. 
+Syslog template
+<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name%%procid%%msgid%%msg%n
+Priority value, Syslog protocol version, timestamp in RFC 3339 format, hostname of the source system, application name generating the log, process ID of the application, Message ID.
+Rewriting the example above in syslog
+<34>1 2019-06-05T22:14:15.003Z server1 sshd - - pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty-ssh ruser= rhost=10.0.2.2
+This format provides a standardized way to capture and analyze logs, making it easier to integrate with centralized logging systems and tools.
+Systemd: is a process and service manager for Linux operating systems. Its logging service is journald that can replace or complement syslog. journald is significantly different from systemd logs. Here are some key aspects of systemd:
+Initialization and Service Management
+    • Primary Role: It initializes the system during boot and manages services and processes while the system is running.
+    • Units: systemd organizes tasks into units, which are resources it can manage (e.g., services, sockets, timers).
+        ◦ .service: Defines how to start, stop, and manage a service.
+        ◦ .socket: Manages socket-based activation for services.
+        ◦ .timer: Schedules services to run at specific times or intervals.
+        ◦ .target: A group of units to achieve a specific state (e.g., multi-user.target).
+Logging and Monitoring
+    • journalctl: systemd integrates with journald for logging, providing centralized and structured logs. The journalctl command is used to query logs.
+    • Monitoring: Services can be monitored and restarted automatically if they fail, ensuring higher reliability.
+Service Control
+        ◦ systemctl start [unit]: Starts a service or unit.
+        ◦ systemctl stop [unit]: Stops a service or unit.
+        ◦ systemctl restart [unit]: Restarts a service or unit.
+        ◦ systemctl enable [unit]: Enables a service to start at boot.
+        ◦ systemctl disable [unit]: Disables a service from starting at boot.
+        ◦ systemctl status [unit]: Shows the status of a service or unit.
+Configuration
+    • Unit Files: Located in /etc/systemd/system/, /lib/systemd/system/, or /usr/lib/systemd/system/, these files define how services should behave.
+    • Drop-ins: Configuration overrides or additions can be placed in .d/ directories to customize unit behavior without modifying the original unit files.
+Journalctl: journald stores log data in binary format instead of plaintext, journalctl is the way to read log messages processed by journald. 
+Visit journalctl man page, and to show all journal entries, mentioning the start and end time, use simple "journalctl" command without any options
+Current boot logs			journalctl -b
+journalctl -b -1	(Earlier boot logs, decrease the number for older boots)
+journalctl --list-boots	
+journalctl --since "1 hour ago"
+journalctl --since "2022-06-26 23:15:00" --until "2022-06-26 23:20:00"
+for unit, or a service, using -u 			journalctl -u nginx.service
+to follow or tail the logs, use -f 			journalctl -f
+journalctl -u mysql.service -f
+for output formats, user -o (jsonwill, json-pretty, verbose, cat, shotis, short-monotonic) 						journactl -u nginx.service -r -o json-pretty
+for priority, use -p				journalctl -b -1 -p "emerg".."crit"
+by user						id mysql
+journalctl_UID=[user_id]
+Log Levels
+OFF: does not log anything
+FATAL: application is about to stop a serious problem or corrupt from happening
+ERROR: inability to access a service or file, or facing an error in the configuration
+WARN: unexpected application problem, not sure the problem will recur or remain. May not harm the application at this point.
+INFO: information, or normal behavior of the application
+DEBUG: diagnostic information in a detailed manner
+TRACE: all the details about the behavior of the application. mostly diagnostic and finer than debug log level.
+ALL: logs everything and includes custom logging levels as well. combination of all the log levels
