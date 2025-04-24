@@ -1,0 +1,45 @@
+Logical Group uses Physical Volume	-	Physical volume are added to Logical volume
+    • Physical Volumes (PVs): These are the underlying storage devices (e.g., hard drives, SSDs, partitions) that LVM uses.
+    • Volume Group (VG): A VG is a container that groups together one or more PVs. It's like a storage pool from which logical volumes are created.
+    • Logical Volumes (LVs): These are the virtual partitions that you create from the VG. They are the filesystems you actually mount and use.
+In essence: PVs are added to a VG, and then LVs are carved out of the VG. The VG acts as an intermediary, abstracting the physical storage and providing flexibility in how storage is allocated
+It uses Logical Volume Manager (LVM) involves a few straightforward steps. 
+Creating Logical Volumes
+Create a Physical Volume (if not already done):	sudo pvcreate /dev/sdX
+Create a Volume Group (if not already done): sudo vgcreate <volume_group_name> /dev/sdX
+Create a Logical Volume:
+sudo lvcreate -L <size> -n <logical_volume_name> <volume_group_name>
+sudo lvcreate -L 10G -n my_lv my_vg	
+Format the Logical Volume (optional): 
+sudo mkfs.ext4 /dev/<volume_group_name>/<logical_volume_name>
+Mount the Logical Volume (optional):	
+sudo mkdir /mnt/<mount_point>
+sudo mount /dev/<volume_group_name>/<logical_volume_name> /mnt/<mount_point>
+Replace <mount_point> with the desired mount point directory.
+Deleting Logical Volumes
+Unmount the Logical Volume (if mounted):	sudo umount /mnt/<mount_point>
+Delete the Logical Volume:
+sudo lvremove /dev/<volume_group_name>/<logical_volume_name>
+(Optional) Remove the Volume Group: If you no longer need the volume group:
+sudo vgremove <volume_group_name>
+(Optional) Remove the Physical Volume: If you want to remove the physical volume from LVM management:				sudo pvremove /dev/sdX
+A[Physical Storage (Disks/Partitions)] --> B(Create Physical Volume (PV)) --> C(Create Volume Group (VG)) --> D(Create Logical Volume (LV)) --> E{Filesystem Creation and Mount}
+Questions-1: Create a LV named LV1 of size 8GB	
+Answer: lsblk 
+pvcreate /dev/nvme0n3		create many as space was not enough
+pvcreate /dev/nvme0n4
+pvcreate /dev/nvme0n5			pvs
+vgcreate VG1 /dev/nvm0n3 /dev/nvme0n4			vgs
+lvcreate -L 8Gb -n LV1 VG1							lvs
+nano /et/cfstab
+/dev/VG1/LV1 /lv xfs defaults 0 0
+Question-2: extend the LV, LV1 by 2GB
+mkdir /lv 					mkfs.xfs /dev/VG1/LV1
+mount -a 					vgs					lvs 
+Ivextend -r -L +2GB dev/VG1/LV1
+Size of logical volume VG1/LV1 changed from 8.GB to 10 GIB (2568 extents). Logical volume VG1/LV1 successfully resized. 				Lvs 
+Question-3: create a LV LV2 with 10 extent where the size of each extent is 8MB
+lvs			pvs				vgdisplay		
+lvcreate -n LV2 -l 10 -L 80M VG1	follow the later one
+lvs			vgs			vgcreate -s 8M VG1 /dev/nvme0n3	vgdisplay	lvcreate -l 10 -n LV2 /dev/VG1
+lvs		80MB
