@@ -1,0 +1,18 @@
+It uses the Logical Volume Manager (LVM). 
+Create Physical Volumes: Before adding physical volumes, you need to create them.
+sudo pvcreate /dev/sdX
+Replace /dev/sdX with the actual disk or partition you want to use.
+Create a Volume Group: If you do not have an existing VG, you can create one:
+sudo vgcreate <volume_group_name> /dev/sdX
+Replace <volume_group_name> with your desired volume group name and /dev/sdX with your physical volume.
+Add Physical Volumes to an Existing Volume Group
+sudo vgextend <volume_group_name> /dev/sdX
+Replace <volume_group_name> with your existing volume group name and /dev/sdX with the new physical volume.
+Verify the Volume Group
+sudo vgdisplay <volume_group_name>		Will display detailed information about the volume group, including the physical volumes it contains.
+Remove a Physical Volume from a Volume Group (Optional)
+If you need to remove a physical volume from a volume group:
+    1. Ensure that there are no logical volumes using the physical volume.
+    2. Move data to other PVs in the group: sudo pvmove /dev/sdX
+    3. Remove the PV from the volume group: sudo vgreduce <volume_group_name> /dev/sdX
+    4. Finally, wipe the physical volume if needed: sudo pvremove /dev/sdX
