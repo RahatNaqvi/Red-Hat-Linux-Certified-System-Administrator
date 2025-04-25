@@ -1,0 +1,37 @@
+It involves configuring the umask value, which determines the default permissions for new files and directories created by a user. Here's how to manage and adjust default file permissions:
+Understanding File Permissions
+    • Files: Default permissions of 666 (read and write for owner, group, and others).
+    • Directories: Default permissions of 777 (read, write, and execute for owner, group, and others).
+The umask value subtracts permissions from these defaults.
+Checking the Current umask Value:				umask
+    • umask is a four-digit octal number.
+    • The first digit (usually 0) is reserved and often ignored.
+    • The next three digits define permissions for the owner, group, and others.
+For example, a umask of 022 means:
+    • Owner: No permissions removed (default remains rw- for files).
+    • Group: Write permission removed (default becomes r-- for files).
+    • Others: Write permission removed (default becomes r-- for files).
+Setting a New umask Value：			umask 027
+    • Owner: rw-
+    • Group: r--
+    • Others: ---
+To set the umask to any number:		umask 027	(A umask of 027 results in default permissions of 750 rwx rx rx for directories and 639 wr r r for files)
+To make the change permanent, add the umask command to your shell configuration file, such as .bashrc or .zshrc.
+    • For bash: Add to ~/.bashrc or /etc/bashrc (for system-wide setting).
+    • For zsh: Add to ~/.zshrc.
+    • For sh: Add to ~/.profile.
+Example for ~/.bashrc:					echo 'umask 027' >> ~/.bashrc
+Verifying New File Permissions
+After changing the umask, create a new file and directory to verify the changes:
+touch newfile
+mkdir newdir
+ls -l newfile newdir
+Default umask in System Configuration: To set umask for all users.
+sudo nano /etc/profile
+Add or modify the line:				umask 027
+System will not allow execution for files even umask is there
+Understanding umask Values.
+Using ACLs for More Granular Control
+For more fine-grained control over default permissions, use Access Control Lists (ACLs):
+Set Default ACLs:	setfacl -d -m u::rwX,g::r-X,o::--- /path/to/directory
+View ACLs:		getfacl /path/to/directory
