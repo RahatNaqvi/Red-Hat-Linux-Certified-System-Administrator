@@ -1,0 +1,72 @@
+SELinux (Security-Enhanced Linux) provides various booleans to allow system administrators to modify the SELinux policy dynamically without needing to modify the underlying SELinux policy files directly. Booleans allow for fine-grained control over system security settings and behaviors, enabling or disabling specific parts of the SELinux policy.
+What are SELinux Booleans?
+Booleans are flags in SELinux policy that control whether certain security restrictions are applied or relaxed. These flags can be toggled between on (enabled) or off (disabled) to allow or prevent particular actions.
+For example, a boolean might control whether a web server can connect to a database, whether the system allows user-mounted file systems, or whether a particular service should be able to open network ports.
+How to List SELinux Booleans:					getsebool -a
+This command shows all booleans in the system, including their current value (on or off).
+E.g., the output might look like this:		httpd_can_network_connect     --> off
+httpd_enable_cgi              --> on
+ftp_home_dir                  --> off
+[root@Bajit ~]# getsebool -a | grep "httpd_enable"
+httpd_enable_homedirs --> off
+[root@Bajit ~]# setsebool -P httpd_enable_homedirs on
+[root@Bajit ~]# getsebool -a | grep "httpd_enable"
+httpd_enable_homedirs --> on
+[root@Bajit ~]# setsebool -P _httpd_enable_homedirs on
+-p here was used for permissive.
+How to Check the Value of a Specific Boolean: For example, to check if the boolean httpd_can_network_connect is enabled:		getsebool httpd_can_network_connect
+This will output something like:				httpd_can_network_connect --> off
+How to Change SELinux Boolean Settings:	sudo setsebool <boolean_name> <on|off>
+For example, to allow the httpd service to connect to the network, you can enable the httpd_can_network_connect boolean:		sudo setsebool httpd_can_network_connect on
+If you want to turn off the boolean (i.e., prevent HTTPD from making network connections), you can do:							sudo setsebool httpd_can_network_connect off
+Make the Boolean Change Persistent
+If you want the change to persist across reboots, you need to add the -P (persistent) option to the command:				sudo setsebool -P httpd_can_network_connect on
+Commonly Used SELinux Booleans that control various aspects of system security:
+    1. Allow HTTPD to connect to the network:
+        ◦ Boolean: httpd_can_network_connect
+        ◦ Description: Controls whether the Apache web server (httpd) can make network connections.
+        ◦ Command: 	sudo setsebool -P httpd_can_network_connect on
+    2. Allow HTTPD to execute CGI scripts:
+        ◦ Boolean: httpd_enable_cgi
+        ◦ Description: Enables or disables the ability for Apache to execute CGI scripts.
+        ◦ Command: 	sudo setsebool -P httpd_enable_cgi on
+    3. Allow FTP to access user home directories:
+        ◦ Boolean: ftp_home_dir
+        ◦ Description: Controls whether FTP can access home directories (/home/user).
+        ◦ Command: 	sudo setsebool -P ftp_home_dir on
+    4. Allow NFS to bind to TCP port 2049:
+        ◦ Boolean: nfs_export_all_ro
+        ◦ Description: Controls whether NFS can export file systems read-only or read-write.
+        ◦ Command: 	sudo setsebool -P nfs_export_all_ro on
+    5. Allow Samba to create symbolic links:
+        ◦ Boolean: samba_create_home_dirs
+        ◦ Description: Controls whether Samba can create symbolic links for users' home directories.
+        ◦ Command: 	sudo setsebool -P samba_create_home_dirs on
+Listing SELinux Booleans with Descriptions:			semanage boolean -l
+Example: Modify SELinux Booleans for Custom Use Cases
+    1. Allow HTTPD to send email:
+        ◦ Boolean: httpd_can_sendmail
+        ◦ Command: 		sudo setsebool -P httpd_can_sendmail on
+    2. Allow MySQL to bind to TCP/IP ports:
+        ◦ Boolean: mysql_connect_any
+        ◦ Command: 		sudo setsebool -P mysql_connect_any on
+    3. Allow Postfix to send mail via external services:
+        ◦ Boolean: postfix_can_sendmail
+        ◦ Command: 		sudo setsebool -P postfix_can_sendmail on
+    4. Allow NFS to read from home directories:
+        ◦ Boolean: nfs_home_dir
+        ◦ Command: 		sudo setsebool -P nfs_home_dir on
+Managing SELinux Booleans via semanage
+The semanage command can be used to display, add, or delete boolean settings.
+sudo semanage boolean -l
+To change the state of a boolean, semanage can be used similarly to setsebool:
+sudo semanage boolean --modify --on <boolean_name>
+Troubleshooting SELinux with Booleans
+If a service is not working as expected and you suspect it's related to SELinux, you can use audit logs to check for AVC denials (Access Vector Cache denials), which may point to SELinux policy issues.
+To see SELinux-related messages in the audit log, use:	sudo ausearch -m avc -ts recent。
+Question: Ensure that httpd is able to access the user home directory.
+[root@Baljit /]# getsebool -a | grep "httpd"
+httpd_enable_homedirs --> off
+[root@Baljit /]# setsebool -P httpd_enable_homedirs on 
+[root@Baljit /]# getsebool -a | grep "httpd"
+httpd_enable_homedirs --> on
