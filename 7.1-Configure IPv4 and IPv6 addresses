@@ -1,0 +1,44 @@
+It can be done using command-line tools or network configuration files. 
+Using Command-Line Tools: You can use ip or ifconfig to configure IP addresses temporarily (they will reset after a reboot).
+IPv4 Configuration
+List existing interfaces:				ip addr	or Ip addr show 
+Ip addr show eth2 (u can look is up or down)
+Assign an IPv4 address:				sudo ip addr add 192.168.1.100/24 dev eth0
+Replace 192.168.1.100/24 with your desired IP address and subnet, and eth0 with your network interface.
+Bring the interface up:				sudo ip link set dev eth0 up
+IPv6 Configuration
+Assign an IPv6 address:			sudo ip -6 addr add 2001:db8::1/64 dev eth0
+Replace 2001:db8::1/64 with your desired IPv6 address and prefix length.
+Bring the interface up:			sudo ip link set dev eth0 up
+Just as info: Netw
+Configuring IP Addresses Permanently: Edit the network configuration files.
+For Debian/Ubuntu-based systems
+Edit the network configuration file:			sudo nano /etc/network/interfaces
+Add or modify the following lines for IPv4:
+auto eth0
+iface eth0 inet static
+address 192.168.1.100
+netmask 255.255.255.0
+gateway 192.168.1.1
+Add or modify the following lines for IPv6:
+iface eth0 inet6 static
+address 2001:db8::1
+netmask 64
+gateway 2001:db8::1
+Restart the networking service:		sudo systemctl restart networking
+For Red Hat/CentOS-based systems
+Edit the network configuration file:	
+sudo nano /etc/sysconfig/network-scripts/ifcfg-eth0
+Add or modify the following lines for IPv4:
+BOOTPROTO=none
+IPADDR=192.168.1.100
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+Add or modify the following lines for IPv6:
+IPV6ADDR=2001:db8::1/64
+IPV6_DEFAULTGW=2001:db8::1
+Restart the networking service:				sudo systemctl restart network
+Verification
+Check IP addresses:				ip addr
+Ping IPv4:							ping 8.8.8.8
+Ping IPv6:							ping6 2001:4860:4860::8888
