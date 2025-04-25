@@ -1,0 +1,55 @@
+It involves checking the metadata and the content of the images, such as their layers, configurations, and environment variables. You can do this using various tools, including docker (or podman if you’re using a container engine without Docker) and other command-line utilities. 
+Using Docker
+If you have Docker installed, you can inspect container images with the docker command. 
+Inspecting the Image Metadata: To get detailed metadata about a specific image. 
+					docker inspect <image-name>:<tag>
+For example, to inspect the nginx:latest image:		docker inspect nginx:latest
+This command will return detailed JSON output that includes information such as:
+    • Image ID				Created timestamp			Layers (diff IDs)
+    • Entry point and CMD instructions				Environment variables
+    • Exposed ports			Volumes						Labels
+If you want to filter the output to look at specific fields (e.g., the entry point)
+	docker inspect --format '{{.Config.Entrypoint}}' nginx:latest
+Inspecting Image Layers: Each Docker image consists of multiple layers, and you can inspect these layers using the docker history command:	docker history <image-name>:<tag>
+For example:									docker history nginx:latest
+This will show a history of the image layers, including:
+    • Layer ID										Size of the layer
+    • Command that created the layer					Creation time
+Listing Image Information：				docker images
+Will display the repository, tag, image ID, creation date, & size of all images on your system.
+Using Podman (if Docker isn't installed)
+If you're using Podman, a Docker-compatible container engine (often used in systems that don’t want Docker), the commands are quite similar to Docker. Below are some examples:
+ Inspecting the Image					podman inspect <image-name>:<tag>
+For example:							podman inspect nginx:latest
+Image History							podman history <image-name>:<tag>
+For example:							podman history nginx:latest
+Listing Images						podman images
+Viewing the Contents of an Image
+You may want to extract the filesystem or specific files from the image. This can be done by creating a container from the image and then accessing its filesystem.
+Create a Container from the Image: To create a container from an image without starting it, use the docker create or podman create command:
+			docker create --name my-container <image-name>:<tag>
+Or with Podman:			podman create --name my-container <image-name>:<tag>
+This will create a container but won't start it. You can now interact with its filesystem.
+Access the Container Filesystem:
+	docker cp my-container:/path/to/file/on/container /path/to/local/destination
+Or with Podman:	
+podman cp my-container:/path/to/file/on/container /path/to/local/destination
+Interacting with the Image Filesystem Using docker run：Alternatively, you can run the container interactively using the docker or podman run and inspect the filesystem directly:
+			docker run -it --rm <image-name>:<tag> /bin/bash
+Or with Podman:			podman run -it --rm <image-name>:<tag> /bin/bash
+This will give you an interactive shell inside the container where you can explore the contents of the image.
+Using Dive (For Layer Inspection)
+Dive is a third-party tool that allows you to inspect Docker image layers in an interactive way. It shows the contents of each layer, helping you understand how the image is built and where files were added or modified.
+Install Dive：						sudo apt install dive
+Or download the latest release from GitHub:				wget https://github.com/wagoodman/dive/releases/download/v0.10.0/dive_0.10.0_linux_amd64.tar.gz
+tar -xzvf dive_0.10.0_linux_amd64.tar.gz
+sudo mv dive /usr/local/bin/
+Using Dive：				dive <image-name>:<tag>
+For example:				dive nginx:latest
+This will provide an interactive UI showing each layer in the image, the files added in each layer, and a breakdown of image sizes.
+Using Skopeo (For Remote Image Inspection)
+Skopeo is another useful tool for inspecting container images stored in remote registries (without pulling the image to your local machine).
+Install Skopeo：							sudo apt install skopeo
+Inspect a Remote Image：To inspect a remote image in a Docker registry without pulling it locally:				skopeo inspect docker://<registry>/<image>:<tag>
+For example:			skopeo inspect docker://docker.io/nginx:latest
+This will output the image metadata in JSON format, similar to docker inspect, without pulling the image.
