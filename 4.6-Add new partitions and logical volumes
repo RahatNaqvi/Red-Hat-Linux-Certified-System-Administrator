@@ -1,0 +1,38 @@
+Adding New Partitions
+Identify Available Space: lsblk or fdisk -l to list available disks and partitions:
+Create a New Partition:		sudo fdisk /dev/sdX	then within fdisk:
+        ◦ Type n to create a new partition.
+        ◦ Follow the prompts to specify the partition type (primary/extended) and size.
+        ◦ Type w to write changes and exit.
+Format the New Partition: 		sudo mkfs.ext4 /dev/sdXn
+Adding New Logical Volumes
+Create a Physical Volume:		sudo pvcreate /dev/sdXn
+Extend or Create a Volume Group:
+sudo vgextend <volume_group_name> /dev/sdXn		&
+sudo vgcreate <new_volume_group_name> /dev/sdXn
+Create a Logical Volume:
+sudo lvcreate -L <size> -n <logical_volume_name> <volume_group_name>
+Format the Logical Volume:
+sudo mkfs.ext4 /dev/<volume_group_name>/<logical_volume_name>
+Mount the Logical Volume: Add it to /etc/fstab for persistent mounting and mount it:
+sudo mkdir /mnt/<mount_point>		then
+sudo mount /dev/<volume_group_name>/<logical_volume_name> /mnt/<mount_point>
+Adding Swap Space
+Create a Swap Partition or File:
+        ◦ sudo mkswap /dev/sdXn			For a partition:
+        ◦ sudo fallocate -l <size> /swapfile	For a file
+        ◦ sudo chmod 600 /swapfile			For a file
+        ◦ sudo mkswap /swapfile			For a file
+Activate Swap:
+sudo swapon /dev/sdXn  # For partition
+sudo swapon /swapfile  # For file
+Make Swap Persistent: Add an entry in /etc/fstab:
+        ◦ /dev/sdXn  none  swap  sw  0  0		For a partition: 
+        ◦ /swapfile  none  swap  sw  0  0			For a file
+Verify and Monitor
+Check the New Partition and Logical Volume:
+df -h				lsblk
+Check Swap Space:
+free -h				swapon --show
+Non-destructive: Ensure you're not modifying or deleting existing partitions or volumes unintentionally.
+Disk Space: Verify that there's sufficient unallocated space on the disk before creating new partitions or volumes.
