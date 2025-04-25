@@ -1,0 +1,51 @@
+We know basics already. 
+Check Effective Permissions: 		namei -l /path/to/file_or_directory
+Check ACLs (Access Control Lists): If ACLs are used, they may override standard permissions:				getfacl /path/to/file_or_directory
+Check for SELinux Contexts (if applicable): SELinux contexts can affect access:
+ls -Z /path/to/file_or_directory
+Correcting Permission Problems: chmod, chown discussed.
+Fixing ACLs
+Set ACLs: Grant the group groupname read and write access: 
+setfacl -m g:groupname:rw /path/to/file
+Remove ACLs: Remove all ACLs from a file: 
+setfacl -b /path/to/file
+Question:Copy the file /etc/fstab to /var/fstab, the user owner of /var/fstab should be root
+sudo cp /etc/fstab /var/fstab
+sudo chown root:root /var/fstab
+Question: Copy the file /etc/fstab to /var/fstab, the user natasha should have read and write access:
+root@rahat:/var# setfacl -m u:johnBak:rw- /var/fstab
+root@rahat:/var# ls -l fstab
+-rw-rw-r--+ 1 naqvi root 473 Dec 26 09:09 fstab
+root@rahat:/var# getfacl /var/fstab
+getfacl: Removing leading '/' from absolute path names
+# file: var/fstab
+# owner: naqvi
+# group: root
+user::rw-
+user:johnBak:rw-
+group::r--
+mask::rw-
+other::r--
+next q
+Question: Copy the file /etc/fstab to /var/fstab, the group Mac should have no access
+			root@rahat:/var# groupadd syeds
+root@rahat:/var# setfacl -m g:syeds:--- /var/fstab
+root@rahat:/var# getfacl /var/fstab
+getfacl: Removing leading '/' from absolute path names
+# file: var/fstab
+# owner: naqvi
+# group: root
+user::rw-
+user:johnBak:rw-
+group::r--
+group:syeds:---
+mask::rw-
+other::r--
+Fixing SELinux Contexts
+View SELinux Contexts:			ls -Z /path/to/file_or_directory
+Restore Default Context:		sudo restorecon -Rv /path/to/file_or_directory
+Change SELinux Context (if needed):	
+sudo chcon -t <context_type> /path/to/file_or_directory
+Preventing Future Permission Issues
+Look for Hidden ACLs and Extended Attributes: Sometimes hidden ACLs or attributes can cause permission issues. Use:		lsattr /path/to/file_or_directory
+    • Test as a Specific User: Use su or sudo -u to switch to the affected user and test file access:		sudo -u <username> cat /path/to/file
