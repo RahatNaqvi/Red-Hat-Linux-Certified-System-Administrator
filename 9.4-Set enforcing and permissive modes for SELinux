@@ -1,0 +1,72 @@
+SELinux enforces security policies on a system to control access to resources. It has three modes of operation: Enforcing, Permissive, and Disabled.
+Enforcing: SELinux policy is enforced, and denials are logged.
+Permissive: SELinux policy is not enforced, but denials are still logged.
+Disabled: SELinux is completely disabled.
+To set SELinux to Enforcing or Permissive mode, you can use the following methods:
+Checking the Current SELinux Mode:				getenforce 	or 	sestatus
+Changing SELinux Mode Temporarily
+a) Set SELinux to Enforcing Mode:				sudo setenforce 1
+b) Set SELinux to Permissive Mode:				sudo setenforce 0
+To verify the mode after changing it:				getenforce
+Changing SELinux Mode Permanently: You need to edit the SELinux configuration file:
+a) Edit /etc/selinux/config
+Open the SELinux configuration file in a text editor:	sudo nano /etc/selinux/config
+Locate the SELINUX directive, which can have three possible values:
+        ◦ SELINUX=enforcing
+        ◦ SELINUX=permissive
+        ◦ SELINUX=disabled
+Modify the line to set the desired mode. For example:
+        ◦ To enable enforcing mode: 			SELINUX=enforcing
+        ◦ To enable permissive mode: 			SELINUX=permissive
+Save the file and exit the text editor.
+b) Reboot the System:									sudo reboot
+After rebooting, you can check the SELinux mode:				getenforce
+Disabling SELinux: You can modify the SELINUX setting in /etc/selinux/config:
+Edit the configuration file:				sudo nano /etc/selinux/config
+Set the SELINUX directive to disabled:		SELINUX=disabled
+Save the file and reboot the system:		sudo reboot
+Apache Web Server Directory Configuration Tutorial
+Initial Setup
+Create a new HTML directory and test file:			mkdir html
+cd html					ls  # Shows empty directory (0 items)
+touch index.html			cd ~
+Create an alternate document root:			mkdir /New
+cd /New			touch index  # Note: No .html extension initially
+Apache Configuration
+Edit the default Apache virtual host configuration:
+sudo nano /etc/apache2/sites-available/000-default.conf
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/html
+ErrorLog ${APACHE_LOG_DIR}/error.log
+CustomLog ${APACHE_LOG_DIR}/access.log combined
+Install curl for testing:				sudo apt install curl
+Test the default configuration: curl localhost/index.html  Shows "This is a webpage"
+Changing Document Root
+Edit Apache configuration to change document root:
+sudo nano /etc/apache2/sites-available/000-default.conf
+Updated configuration:
+ServerAdmin webmaster@localhost
+DocumentRoot /New
+Test new configuration:	curl localhost/index  # Not responding as expected
+Troubleshooting with SELinux
+Investigate permissions differences:
+ls -lZ /var/www/html/index.html  # Check SELinux context of working file
+ls -lZ /New/index.html           # Check SELinux context of non-working file
+ls -ldZ /New                     # Check SELinux context of new directory
+ls -ldZ /var/www/html            # Check SELinux context of default directory
+Fix file name and SELinux context:
+mv /New/index /New/index.html    # Rename file to have .html extension
+Apply correct SELinux context to new directory:
+semanage fcontext -a -t httpd_sys_content_t "/New(/.*)?"  # Set SELinux file context rule
+restorecon -Rv /New                                      # Apply the context
+Verify SELinux context changes:			ls -ldZ /New			ls -lZ /New
+Edit content of the HTML file:		nano /New/index.html  # Add content to the file
+Test again:	curl localhost/index.html  # Should now display the content
+Managing SELinux Modes
+Change SELinux enforcement level:
+# To check current mode:			getenforce
+# To change temporarily:	sudo setenforce 0  # Set to permissive (0) or enforcing (1)
+# To change permanently:		sudo nano /etc/sysconfig/selinux
+Change SELINUX=enforcing 		SELINUXTYPE=targeted
+Apply changes: semanage fcontext -a -t httpd_sys_content_t /New
+		sudo reboot
