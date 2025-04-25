@@ -1,0 +1,26 @@
+  You need to edit the /etc/fstab file. 
+Identify the UUID or Label
+sudo blkid 	Use blkid to list all block devices with their UUIDs and labels:
+sudo blkid /dev/sdXn 	Find UUID/Label of a Specific Device.
+Edit /etc/fstab
+Open /etc/fstab: 			sudo nano /etc/fstab
+Add a New Entry: Add a new line in the format:
+UUID=<uuid>  <mount_point>  <filesystem_type>  <options>  <dump>  <pass>
+or using the label:
+LABEL=<label>  <mount_point>  <filesystem_type>  <options>  <dump>  <pass>
+UUID=123e4567-e89b-12d3-a456-426614174000  /mnt/data  ext4  defaults  0  2
+Example with Label:	LABEL=mydata  /mnt/data  ext4  defaults  0  2
+        ◦ <mount_point>: Directory where the file system will be mounted (e.g., /mnt/data).
+        ◦ <filesystem_type>: File system type (e.g., ext4, xfs).
+        ◦ <options>: Mount options (e.g., defaults).
+        ◦ <dump>: Whether to back up the file system (0 for no, 1 for yes).
+        ◦ <pass>: Order in which file system checks are done at boot (0 to disable).
+Save and Exit: Save the file and exit the editor (Ctrl+O to save, Ctrl+X to exit in nano).
+Create the Mount Point: If the mount point directory does not exist, create it:
+sudo mkdir -p /mnt/data
+Test the Configuration
+Mount All File Systems: 	sudo mount -a
+Verify the Mount: Use df -h or mount to verify that the file system is mounted.
+    • Backup /etc/fstab: Always backup the /etc/fstab file before making changes: 
+    • sudo cp /etc/fstab /etc/fstab.bak
+    • Avoid Typos: A misconfiguration in /etc/fstab can cause boot issues.
