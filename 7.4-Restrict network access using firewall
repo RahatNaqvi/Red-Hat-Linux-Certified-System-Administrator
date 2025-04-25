@@ -1,0 +1,24 @@
+Firewalld is a dynamic firewall manager that supports firewall zones and uses the iptables backend.
+Install and Start firewalld:			sudo apt install firewalld        
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+Check the Current Status:			sudo firewall-cmd --state
+List Active Zones: Zones are pre-defined sets of rules in firewalld. 
+				sudo firewall-cmd --get-active-zones
+Add or Change the Zone for a Network Interface: 
+    • To associate a network interface with a specific zone:
+sudo firewall-cmd --zone=public --change-interface=eth0
+Replace public with your desired zone and eth0 with your network interface.
+Restrict Access by Adding Rules
+    • Allow a service through the firewall:
+sudo firewall-cmd --zone=public --add-service=http --permanent
+    • Allow a specific port:
+sudo firewall-cmd --zone=public --add-port=8080/tcp --permanent
+    • To block an IP address:
+sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="192.168.1.100" reject' --permanent
+    • To allow traffic from a specific IP:
+sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="192.168.1.101" accept' --permanent
+Reload firewalld
+After making changes, reload firewalld to apply them:	sudo firewall-cmd --reload
+Verify Rules：Check the current rules to verify they are applied correctly:
+			sudo firewall-cmd --list-all
