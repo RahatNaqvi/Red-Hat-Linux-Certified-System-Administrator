@@ -1,0 +1,34 @@
+It involves setting up user accounts with administrative privileges, typically using sudo. 
+Granting Superuser Access
+sudo allows a permitted user to execute a command as the superuser or another user.
+Add a User to the sudo Group: In many distributions, users in the sudo group are granted superuser privileges.
+sudo usermod -aG sudo username				sudo usermod -aG sudo john
+Verify User is in the sudo Group:			groups username
+Switch to Superuser Privileges: The user can now execute commands with sudo:
+sudo command						sudo apt update
+Configuring sudo Permissions
+Edit the sudoers File: Use visudo to safely edit the sudoers file to prevent syntax errors that could lock you out of superuser access.
+sudo visudo
+Grant Full Superuser Privileges: To give a user full superuser access, add the following line (if not already present):
+username ALL=(ALL:ALL) ALL
+Example:			john ALL=(ALL:ALL) ALL
+Allow Passwordless sudo (Optional): If you want the user to run sudo commands without being prompted for a password (use with caution):
+username ALL=(ALL) NOPASSWD: ALL
+Creating a New Superuser Account
+Create a New User:					sudo adduser username
+Add the User to the sudo Group:		sudo usermod -aG sudo username
+Switch to the New User:				su - username
+Test sudo Access:						sudo whoami
+The output should be root, confirming superuser access.
+Restricting Superuser Access 
+Remove a User from the sudo Group:		sudo deluser username sudo
+Example:	Check etc folder, John deleted			sudo deluser john sudo
+Limit sudo Commands: To restrict a user to only certain sudo commands, modify the sudoers file:
+username ALL=(ALL) /path/to/command
+Example:				john ALL=(ALL) /bin/systemctl
+This restricts john to only use sudo for systemctl commands.
+Switching to the Root User
+Switch to the Root User: Use su to switch to the root account:
+Direct Root Login: It's generally discouraged for security reasons, but you can enable root login by setting a root password:
+sudo passwd root
+Allowing direct root login, especially via SSH, poses a security risk. It's safer to use sudo.
