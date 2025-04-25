@@ -1,0 +1,30 @@
+Creating a Group:			sudo groupadd groupname
+Example:					sudo groupadd developers
+Deleting a Group			sudo groupdel groupname
+Example:					sudo groupdel developers
+Modifying a Group
+Change the group name:		sudo groupmod -n newgroupname oldgroupname
+Example:						sudo groupmod -n devs developers
+Change the group ID (GID):		sudo groupmod -g newgid groupname
+Example:							sudo groupmod -g 1050 devs
+Adding Users to a Group
+Add a user to a supplementary group:	sudo usermod -aG groupname username
+Example:							sudo usermod -aG developers john
+The -a flag appends the group to the user's existing groups, preventing the removal of the user from other groups.
+Using gpasswd Command
+Add a user to a group:			sudo gpasswd -a username groupname
+Example:						sudo gpasswd -a john developers
+Remove a user from a group:	sudo gpasswd -d username groupname
+Example:							sudo gpasswd -d john developers
+Listing Groups and Group Memberships
+List all groups:				cat /etc/group
+List the groups a user belongs to:		groups username
+Example:									groups john
+Show detailed information about a user’s groups:
+id username
+Removing Users from a Group
+Remove a user from a group (without -a flag):	
+sudo usermod -G groupname username
+Note: This will remove the user from all other supplementary groups.
+To remove only one group and keep the others, first list the groups and then reassign all except the one to be removed.
+Example:			sudo usermod -G group1,group2 username
