@@ -1,0 +1,58 @@
+Scheduling tasks can be done using at for one-time tasks and cron for recurring tasks. 
+Using at for One-Time Tasks
+Install at (if not installed):		sudo apt update		sudo apt install at
+Start atd Service: Ensure the atd service is running:
+sudo systemctl start atd						sudo systemctl enable atd
+Schedule a Task with at
+Open at with a Time Specification:		at 2:30 PM
+Enter the Command: Type the command you want to run at the specified time, then press Ctrl+D to exit.
+Example:			echo "Backup completed" > /tmp/backup.log
+List Scheduled Jobs:			atq
+Remove a Scheduled Job:		atrm <job_number>
+Time Specifications for at
+Run at a specific time: at 2:00 PM
+Run at a specific date: at 2:00 PM 2025-01-06
+Run in a relative time: at now + 2 hours
+Using cron for Recurring Tasks
+Edit the Crontab File
+Open the Crontab Editor:			crontab -e
+Add a Cron Job: Use the following format:
+* * * * * /path/to/command
+        ◦ Fields: 
+            ▪ minute (0-59)
+            ▪ hour (0-23)
+            ▪ day of month (1-31)
+            ▪ month (1-12)
+            ▪ day of week (0-7) (0 and 7 are both Sunday)
+Run a script every day at 3:00 AM:			0 3 * * * /path/to/script.sh
+    • if * is put in any of the first 5 fields, it means all the values
+    • range of number can be used with a hyphen (-)
+    • a comma can be used to include a list of numbers
+    • slash (/) can be used to skip a given number of values e.g */4 in hours means every 4 hours
+Question_cron: Execute the command /usr/local/bin/backup at exactly 10:00am on Feb, 4th every year
+crontab -e
+0	10	4	2	*	/usr/local/bin/backup
+Question_cron: Configure a cron job that runs for the user Rahat at 12:08 every Thursday and execute /bash/echo hello
+crontab -u Rahat -e
+8 12 * * 4 /bash/echo hello OR 8 12 * * * THU /bash/echo hello
+To permit a user to run cron jobs, list it in /etc/cron.allow file, if file doesnt exist, and /etc/cron.deny exist, make sure the user is not in that file. 
+echo "Rahat" | sudo tee -a /etc/cron.allow
+Save and Exit: Save the file to activate the cron job.
+List Cron Jobs for the Current User:			crontab -l
+List System-Wide Cron Jobs: System-wide cron jobs are listed in /etc/crontab and /etc/cron.d/.
+cat /etc/crontab					ls /etc/cron.d/
+Special cron Directories
+    • /etc/cron.hourly: Run scripts hourly.
+    • /etc/cron.daily: Run scripts daily.
+    • /etc/cron.weekly: Run scripts weekly.
+    • /etc/cron.monthly: Run scripts monthly.
+Cron Special Time Strings
+    • @reboot: Run once at startup.		@yearly: Run once a year.		
+    • @monthly: Run once a month.		@weekly: Run once a week.			
+    • @daily: Run once a day.				@hourly: Run once an hour.
+Run a script at system reboot:	@reboot /path/to/script.sh
+Common cron Troubleshooting
+Check Cron Logs: Logs are usually stored in /var/log/cron or /var/log/syslog.
+grep CRON /var/log/syslog
+Ensure Cron Service is Running:		sudo systemctl status cron.service
+0 5 * * 1 tar -zcf /var/backup/home.tgz /home		A sample backup cron job
