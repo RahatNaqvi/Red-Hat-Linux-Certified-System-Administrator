@@ -1,0 +1,82 @@
+Firewalld is a dynamic firewall management tool with support for network/firewall zones in Linux. firewall-cmd is its command-line interface. 
+Basic Concepts of firewalld
+Zones: Define the trust level of network connections.
+Services: Predefined rules for common services like HTTP, SSH, etc.
+Ports: Define specific port rules. 
+Installing firewalld:			sudo apt install firewalld  
+Starting and Enabling firewalld
+Start firewalld:							sudo systemctl start firewalld
+Enable firewalld to start on boot:		sudo systemctl enable firewalld
+Check the status:						sudo systemctl status firewalld
+Configuring Firewall Settings
+a) List Current Firewall Rules				sudo firewall-cmd --list-all
+b) Set Default Zone			sudo firewall-cmd --set-default-zone=zone_name
+Example:						sudo firewall-cmd --set-default-zone=public
+c) Allowing a Service: To allow a service (like HTTP or SSH) in the current default zone:
+sudo firewall-cmd --add-service=service_name --permanent
+Example:			sudo firewall-cmd --add-service=http --permanent
+sudo firewall-cmd --reload
+d) Opening a Specific Port: To open a specific port (e.g., port 8080/tcp):
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
+e) Remove a Service or Port
+sudo firewall-cmd --remove-service=service_name --permanent
+sudo firewall-cmd --remove-service=http --permanent
+sudo firewall-cmd --remove-port=port/protocol --permanent
+sudo firewall-cmd --reload
+f) Check if a Port/Service is Open
+sudo firewall-cmd --query-service=service_name
+sudo firewall-cmd --query-service=http
+sudo firewall-cmd --query-port=port/protocol
+sudo firewall-cmd --query-port=8080/tcp
+Advanced Configurations
+a) Adding a Rich Rule
+Rich rules offer more control over traffic:
+sudo firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.1.100" service name="http" accept' --permanent
+sudo firewall-cmd --reload
+This allows HTTP traffic from a specific IP address.
+b) Blocking an IP Address
+sudo firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.1.100" drop' --permanent
+sudo firewall-cmd --reload
+c) Setting Zone for an Interface
+Assign a network interface to a specific zone:
+sudo firewall-cmd --zone=zone_name --change-interface=interface_name –permanent
+sudo firewall-cmd --zone=public --change-interface=eth0 --permanent
+sudo firewall-cmd --reload
+Temporary Changes
+To make temporary changes that don’t persist after a reboot, omit the --permanent flag.
+Disabling firewalld
+If you need to disable the firewall (not recommended for production):
+Stop firewalld:					sudo systemctl stop firewalld
+Disable firewalld:				sudo systemctl disable firewalld
+Logging Firewall Events
+sudo firewall-cmd --set-log-denied=all
+sudo firewall-cmd --reload
+Logs can be viewed in /var/log/firewalld.
+UFW (Uncomplicated Firewall) is a front-end for managing firewall rules in Linux systems. It's a simplified interface for managing iptables and is commonly used on Ubuntu and other Debian-based distributions. UFW allows you to easily configure rules to control incoming and outgoing network traffic to secure your system.
+Install and enable ufw: sudo apt update				sudo apt install ufw
+					sudo ufw enable
+Allow or Deny Ports and Services
+    • Allow a specific port (e.g., HTTP port 80):		sudo ufw allow 80/tcp
+    • Allow a range of ports (e.g., ports 1000-2000):		sudo ufw allow 1000:2000/tcp
+    • Allow a specific service (e.g., HTTP or SSH):		sudo ufw allow ssh
+    • Allow a specific IP (e.g., allow SSH from a specific IP address):
+			sudo ufw allow from 192.168.1.100 to any port 22
+    • Deny a specific port (e.g., block access to port 25):		sudo ufw deny 25/tcp
+    • Allow traffic from a specific subnet:
+				sudo ufw allow from 192.168.1.0/24 to any port 80
+    • Deny all traffic from a specific IP:		sudo ufw deny from 192.168.1.100
+    • Delete a rule:					sudo ufw delete allow 80/tcp
+Allow or Deny Services by Name
+    • Allow HTTP (port 80) service:			sudo ufw allow http
+    • Allow SSH service:						sudo ufw allow ssh
+Sudo apt nginx			Yes				Ipa
+Find the ip using ifconfig then use this ip at your workstation:		ufw status
+ufw allow 80/tcp			ufw show added
+ufw allow 22/tcp			ufw show added
+ufw default deny incoming
+ufw enable
+ufw status					Access the webpage.
+Ufw delete allow 80/tcp		ufw status 			and again access webpage
+watch netstat -anpt: Shows all connections and listening ports, numerical addresses, (PID) and TCP connections. If not installed then apt install net-tools
+ufw show added		ufw deny 80/tcp			ufw show added			watch netstat -anpt		ufw status
