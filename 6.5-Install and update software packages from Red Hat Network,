@@ -1,0 +1,76 @@
+To install and update software packages from several sources, the package management tool used is dnf. 
+To install or update software packages from Red Hat Network (RHN), you must first register your system with the Red Hat subscription service to enable access to the official Red Hat repositories.
+Registering the System with Red Hat Subscription Management
+Register the system:		sudo subscription-manager register
+You will be prompted for your Red Hat username and password.
+Attach the subscription (if necessary):	sudo subscription-manager attach --auto
+Enable repositories:
+sudo subscription-manager repos --enable=rhel-7-server-rpms
+Adjust the repository name depending on your version and system requirements.
+Installing and Updating Packages via dnf 
+Install a package:			sudo dnf install package_name
+Example:					sudo dnf install httpd
+    • Update all installed packages:		sudo dnf update
+    • Update a specific package:			sudo dnf update package_name
+Installing and Updating from a Remote Repository
+In addition to the official RHN repositories, you can configure your system to use remote repositories such as EPEL (Extra Packages for Enterprise Linux) or any other third-party repositories.
+Enabling and Using Remote Repositories
+sudo dnf install epel-release		
+This will enable the EPEL repository, which provides additional packages that are not included in the official Red Hat repositories.
+Install a package from a remote repository:	sudo dnf install package_name
+Example (installing nginx from the remote repository):	sudo dnf install nginx
+Search for a package in the repositories:	sudo dnf search package_name
+Update all installed packages from all enabled repositories:	sudo dnf update
+Adding the Repository: Running the command will add the repository to the list of sources your system uses to find software packages. This is typically done when you want to install software that's not available in the official Ubuntu or Debian repositories.
+Installing Software: After adding the repository, you would run:
+sudo apt update
+sudo apt install <package-name>
+sudo add-apt-repository "deb https://www.google.com/rahat lunar main"
+apt-add-repository –list		(To check the added repository)
+The apt update command refreshes your package list to include any new packages or updates from the newly added repository. Then, you can install packages from it using apt install.
+You might need to import a key using a command like:
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys <KEY-ID>
+Steps to Add a Repository Manually in /etc/apt/sources.list:
+Open the sources.list File for Editing:		sudo nano /etc/apt/sources.list
+Add the New Repository:	You need to add the repository URL to this file. 
+deb <repository-url> <distribution> <components>
+deb https://www.google.com/rahat lunar main
+Save and Exit the Editor
+sudo apt update
+Now you can install any package that is available from this new repository using the following command:			sudo apt install <package-name>
+How to register and enabe repos in redhat? Subscriptoin manager command in RHEL.
+    • Sudo apt install apache2
+    • Go developer.redhat.com		& register
+    • [root@10 1# subscription-manager register --username ba 8--password S
+    • --auto-attach
+    • The registered system name is: 10.0.2.15
+    • Status:	Subscribed
+    • Sytemctl start apache2
+    • systemctl status apache2
+Configuring Third-Party Repositories
+If you want to install software from a third-party repository (not included by default), you can manually add the repository configuration.
+Create a .repo file in /etc/yum.repos.d/. For example:
+sudo nano /etc/yum.repos.d/third-party.repo
+Add the repository configuration. Here’s an example of a custom repository:
+[third-party-repo]
+name=Third Party Repository
+baseurl=http://repo.example.com/centos/7/x86_64/
+enabled=1
+gpgcheck=1
+gpgkey=http://repo.example.com/RPM-GPG-KEY
+Save the file and exit.
+Install software from the newly added repository:	sudo dnf install package_name
+Installing and Updating from the Local File System (RPM Packages)
+Sometimes, you may have an RPM package file (.rpm) stored locally on your system and you need to install or update it manually.
+Installing an RPM Package from the Local File System
+Install an RPM package from a local file: sudo dnf install /path/to/package.rpm
+	sudo dnf install /home/user/packages/httpd-2.4.6-93.el7.x86_64.rpm
+If the RPM has dependencies, dnf will attempt to resolve them by using the enabled repositories.
+Upgrade an RPM package from a local file:		
+sudo dnf upgrade /path/to/package.rpm
+This will upgrade the installed package if the version in the local RPM file is newer than the installed version.
+If you want to install an RPM package without checking for dependencies (be cautious with this approach), you can use the --nodeps option. It bypasses dependency checks, which can break package functionality.
+Force install an RPM:		sudo dnf install --nodeps /path/to/package.rpm
+Force upgrade an RPM:		sudo dnf upgrade --nodeps /path/to/package.rpm
+Installing Multiple RPM Packages from a Directory
+If you have multiple .rpm files in a directory and want to install them all, you can use the following command:				sudo dnf install /path/to/directory/*.rpm
