@@ -1,0 +1,33 @@
+It involves assigning or modifying the security contexts (labels) associated with ports used by services. SELinux enforces policies on ports based on their type (e.g., HTTP, SSH), and these labels must match the policy requirements for the service to work correctly. If a port is not labeled correctly, SELinux can block access to the service, even if the port is open.
+View Current SELinux Port Labels
+sudo semanage port –l  Will show the current SELinux context for various ports (e.g., tcp, udp), and the assigned service type (e.g., http_port_t for HTTP.
+Assign a SELinux Label to a Port: To assign port 8080 (TCP) to the http_port_t type (which is used by web servers like Apache or Nginx), -a (add) option. run:
+sudo semanage port -a -t http_port_t -p tcp 8080
+This tells SELinux that port 8080 should be treated as an HTTP service port.
+Remove a SELinux Port Label
+use the -d (delete) option. For example, to remove the port label for port 8080 (if previously added), you can run: sudo semanage port -d -t http_port_t -p tcp 8080
+List Specific SELinux Port Labels: This will display only ports related to the http_port_t type.				sudo semanage port -l | grep http
+Set Port Labels for Custom Services
+If you're running a custom service on a non-standard port, you'll need to assign the correct SELinux label for that port. For example, if you're running a custom web application on port 9090, you might want to assign it the http_port_t label:
+sudo semanage port -a -t http_port_t -p tcp 9090
+Make SELinux Changes Persistent: Any changes made with semanage are persistent and will survive reboots, as the settings are written to the SELinux policy database.
+Check the Current Port Label: To see, what SELinux context is assigned to a specific port, 					seinfo -p
+Troubleshooting SELinux Port Label Issues
+If SELinux is blocking access to a port (e.g., a web server on a custom port), you may see messages in the audit logs (/var/log/audit/audit.log). To troubleshoot and allow access, you might need to adjust the port labels:
+sudo ausearch -m avc -ts recent
+If you find an AVC (Access Vector Cache) denial related to ports, assign the correct label using semanage port -a or review the audit logs to understand what port labels need modification.
+Disable SELinux (Not Recommended)
+You can set it to permissive mode:				sudo setenforce 0
+To re-enable enforcing mode:					sudo setenforce 1
+This change is temporary and will not persist after reboot. To make SELinux permanently permissive or disabled, you need to modify the /etc/selinux/config file:
+SELINUX=permissive			# or		SELINUX=disabled
+This approach weakens security and should only be used in exceptional cases.
+getenforce	
+setenforce 0				getenforce			setenforce 1			getenforce			
+Permanently Changing SELinux Mode:		nano /etc/sysconfid/selinux
+Set: SELINUX directive to disabled:		SELINUX=disabled		SELINUXTYPE=targeted
+Reload SELinux Policy (if needed)
+If you've made changes to the SELinux policies or port labels, you may want to reload the policy without rebooting. You can do this with the following:
+sudo restorecon -R /etc/selinux
+Question: The system isn’t able to connect to httpd service at port 82. It should be accessible at port 82 and should start at boot time.
+Ans:		semanage port -a -t http_port_t -p tcp 82
