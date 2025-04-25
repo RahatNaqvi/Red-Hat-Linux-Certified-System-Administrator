@@ -1,0 +1,92 @@
+It involves configuring the system to resolve domain names to IP addresses. This is primarily done through DNS and the hosts file. 
+Modify the Hosts File： /etc/hosts file used to map hostnames to IP addresses locally, without querying a DNS server.
+Open the hosts file:					sudo nano /etc/hosts
+Add entries for hostname resolution:
+127.0.0.1    localhost
+192.168.1.100 myserver.local myserver
+Replace 192.168.1.100 with the IP address of your server and myserver.local with the desired hostname.
+Save and exit: Press CTRL + X, then Y, and Enter to save and close the file.
+Configure DNS Servers
+DNS servers are specified in the /etc/resolv.conf file. DNS domain name server is ip allocated and equal to a website e.g. google.com has ip 8.8.8.8
+traceroute netflix.com = It will trace the route of netflix server IP. e.g 3.251.50.149
+find ip address of 3.251.50.149 and find the server
+ISP internet service provider is Nayatel
+Open the resolv.conf file:			sudo nano /etc/resolv.conf
+Add DNS server entries:
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+Replace 8.8.8.8 and 8.8.4.4 with the IP addresses of your preferred DNS servers.
+Save and exit: Press CTRL + X, then Y, and Enter to save and close the file.
+Persistent DNS Configuration
+Since /etc/resolv.conf can be overwritten by network managers, make the DNS configuration persistent. Therefore, 
+For systems using NetworkManager:
+Edit or create the DNS configuration file:
+sudo nano /etc/NetworkManager/conf.d/dns.conf
+Add the following content:
+[main]
+dns=default
+Restart NetworkManager:			sudo systemctl restart NetworkManager
+For systems using systemd-resolved:
+Link the resolv.conf to systemd-resolved:
+sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+Configure DNS in systemd-resolved:		sudo nano /etc/systemd/resolved.conf
+Uncomment and set DNS entries:
+DNS=8.8.8.8 8.8.4.4
+Restart systemd-resolved:				sudo systemctl restart systemd-resolved
+Test Hostname Resolution
+Ping the hostname:				ping myserver.local
+ping google.com (To check cnnections and IPs)
+Check DNS resolution:				nslookup example.com
+nslookup google.com
+Server:		172.27.127.31
+Address:	172.27.127.31#53
+** server can't find google.com: REFUSED
+nslookup shutmeloud.com
+Server:		172.27.127.31
+Address:	172.27.127.31#53
+
+** server can't find shutmeloud.com: REFUSED
+Check current DNS settings:		cat /etc/resolv.conf
+curl google.com	(curl is a tool to transfer data from or to a server, using one of the supported protocols (HTTP, HTTPS, FTP, FTPS, SCP, SFTP, TFTP, DICT, TELNET,  LDAP  or  FILE).  The command is designed to work without user interaction.)
+man curl
+If you want to change the hostname, hostnamectl command is also used. 
+homectl 		shows computer details/properties
+hostnamectl set-hostname Rahat			Will replace the host name
+For configuring network connection, use nmcli or nmtui but nmcli is recommended
+    • create new connection 		
+    • nmcli con add
+    • Start work here:			nmcli con show			
+nmcli con show lo
+nmcli con add con-name "Default" type ethernet ifname enp1s0 ip4 192.168.15.14/16 gw4 192.168.1.2
+nmcli con up “Defaults”		
+nmcli con show Defaults	
+nmcli con show
+    • nmcli con mod for modification	(auto connect and modification)
+# Set 'autoconnect' to yes for the connection named "Defaults"
+nmcli con mod "Defaults" connection.autoconnect yes
+nmcli con show "Defaults"
+
+# Set IPv4 address to 192.168.5.5 with subnet mask /24
+nmcli con mod "Defaults" ipv4.addresses 192.168.5.5/24
+nmcli con show "Defaults"
+
+# Set DNS server to 172.2.2.2
+nmcli con mod "Defaults" ipv4.dns 172.2.2.2
+nmcli con show "Defaults"
+
+# Just a trial: Add another IP address to a different connection (Default1)
+nmcli con mod "Default1" +ipv4.addresses 192.168.3.3/24
+Question: Create a new connection named Net of Type ethernet having interface name eth0, 1. IP address: 200.0.0.12/16, 		2. Gateway: 20.0.0.1		3. DNS: 8.8.8.8
+nmcli con add con-name Net type ethernet ifname eth8 ip4 208.8.8.12/16 gw4 208.8.8.1
+nmcli con mod Net ipv4.dns 8.8.8.8
+nmcli con show Net
+nmcli con up Net
+Question: Configure the network connection, IP 172.24.5.10, netmask 255.255.255.0 and gateway 172.24.5.48:
+nmcli con add con-name MyConnection type ethernet		Create a new connection
+nmcli con mod MyConnection ipv4.addresses 172.24.5.10/24	Set IP+netmask/24
+nmcli con mod MyConnection ipv4.gateway 172.24.5.48		
+nmcli con mod MyConnection ipv4.method manual		Set the connection method
+nmcli con up MyConnection
+Question: Set the hostname to : Server
+hostnamectl set-hostname Server
+echo "Server" > /etc/hostname		to make it persistent across reboots
