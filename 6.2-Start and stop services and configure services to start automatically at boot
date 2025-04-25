@@ -1,0 +1,17 @@
+It is done with a service manager such as systemd (which is the most commonly used on modern Linux distributions) or SysVinit. 
+Starting a Service					sudo systemctl start service_name
+sudo systemctl start apache2    
+Stopping a Service				sudo systemctl stop service_name
+								sudo systemctl stop apache2
+Checking the Status of a Service	sudo systemctl status service_name
+								sudo systemctl status apache2
+Enabling a Service to Start Automatically at Boot	
+sudo systemctl enable service_name
+sudo systemctl enable apache2
+Disabling a Service from Starting Automatically at Boot
+				sudo systemctl disable service_name
+Restarting a Service: To restart a service (useful if you've made changes to its configuration), use:
+sudo systemctl restart service_name
+Reloading a Service’s Configuration: sudo systemctl reload service_name
+Viewing Logs of a Service: To view a specific service, use journalctl:
+sudo journalctl -u service_name
