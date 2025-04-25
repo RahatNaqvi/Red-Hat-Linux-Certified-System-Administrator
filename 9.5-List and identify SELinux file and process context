@@ -1,0 +1,32 @@
+In SELinux (Security-Enhanced Linux), the security context associated with files and processes is critical for determining the level of access a subject (like a process) can have on an object (like a file). SELinux uses a set of labels called contexts, which define the access control rules for files and processes.
+Listing SELinux C ontexts for Files
+You can use the ls command with the -Z option:		ls -Z /path/to/fileORdirectory.
+Example:											ls -Z /etc/selinux/
+Output:	-rw-r--r--. root root system_u:object_r:selinux_config_t:s0 /etc/selinux/config
+    • system_u: User (system user in this case).
+    • object_r: Role (used for objects like files or processes).
+    • selinux_config_t: Type (this is the file's type context).
+    • s0: Sens itivity level (for MLS, this indicates the security level; s0 is the lowest level).
+To list SELinux contexts for all files in a directory:				ls -ZR /path/to/directory
+Identifying SELinux Contexts for running Processes
+You can use the ps command with the -Z option:					ps -eZ
+Output:			system_u:system_r:init_t:s0  1  ?  00:00:05 init
+		system_u:system_r:kernel_t:s0  2  ?  00:00:00 kthreadd
+Explanation of context parts:
+    • system_r: The role.
+    • init_t: The type, representing the process type.
+Checking SELinux Context of a Specific Process:		ps -Z -p <PID>
+$ ps -Z -p 1234		system_u:system_r:httpd_t:s0  1234 ?  00:01:23 /usr/sbin/httpd
+Checking SELinux Context Using stat Command:		stat -c %Z /path/to/file
+Changing SELinux Contexts:		chcon -t httpd_sys_content_t /path/to/file
+This will change the SELinux type of the specified file to httpd_sys_content_t, which is typically used for files served by the Apache HTTP server.
+Listing All SELinux Contexts for Files with semanage (for Advanced Management)
+The semanage command (part of policycoreutils-python package) can be used to manage SELinux policies. To list the types for a specific directory or files:
+semanage fcontext –l		This will list all file contexts defined in the system.
+Question: Ensure that the httpd service is able to access and host files from the /test directory.
+Ans: 	ls /var/www/html			cat /var/www/html/index.html		curl localhost/index.html	mkdir /test	touch /test/index.html		to	/test/index.html			ls -l /test		ls -lZ /test		ls -lZ /var/www/html		
+semanage fcontext -a -t httpd_sys_content_t "/test(.*)?"			restorecon -Rv /test		ls -lZ /test			ls -lZd /test			nano /etc/httpd/conf/httpd.conf
+DocumentRoot “/test”
+<Directory “/var/www”>
+	AllowOverride None
+systemctl restart httpd			curl localhost/index.html
