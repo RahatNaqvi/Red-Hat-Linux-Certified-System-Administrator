@@ -1,0 +1,72 @@
+Autofs is a Linux service that automatically mounts filesystems on demand when they are accessed and unmounts them after a period of inactivity. It helps manage network shares (like NFS), removable devices, or even local directories more efficiently — especially useful in environments like enterprise systems or labs.
+Automounting file systems uses autofs – mount file systems only when they are accessed, and unmounting them after a period of inactivity. 
+Install autofs:		sudo apt update		sudo apt install autofs
+Configure autofs: Configuration files located in /etc. The main files to configure are /etc/auto.master and map files (e.g., /etc/auto.nfs).
+Edit /etc/auto.master: File defines the directories that autofs will manage.
+Open /etc/auto.master:		sudo nano /etc/auto.master
+Add an Entry: Add a line to specify a mount point and the corresponding map file:
+/mnt/nfs /etc/auto.nfs --timeout=60
+        ◦ /mnt/nfs: The directory where file systems will be automounted.
+        ◦ /etc/auto.nfs: The map file defining specific mounts.
+        ◦ --timeout=60: Optional timeout (in seconds) after which the mount is unmounted if not accessed.
+Create the Map File /etc/auto.nfs
+Create/Edit the Map File:		sudo nano /etc/auto.nfs
+Define Mount Points: Specify the mounts in the format:
+<mount_point> -options <server>:<exported_path>
+Example:
+share1 -rw,sync 192.168.1.100:/exported_folder1
+share2 -ro 192.168.1.100:/exported_folder2
+        ◦ share1 and share2 are directories under /mnt/nfs that will be created dynamically.
+        ◦ -rw,sync and -ro are mount options.
+        ◦ 192.168.1.100:/exported_folder1 is the NFS server and export path.
+Start and Enable autofs
+Restart the autofs Service:		sudo systemctl restart autofs
+Enable autofs to Start at Boot:		sudo systemctl enable autofs
+Verify Configuration
+Access the Mount Point: Try accessing the mount point to trigger the automount:
+ls /mnt/nfs/share1
+Check Mount Status: Check if the file system is mounted:	mount | grep /mnt/nfs
+Check Logs: If something doesn't work as expected, check the logs for errors:
+sudo journalctl -xe | grep autofs
+Additional Configuration
+Unmount Idle File Systems: The --timeout=60 option in /etc/auto.master specifies that the file system should be unmounted after 60 seconds of inactivity. 
+Map File Options: In addition to NFS, autofs can be used for other types of file systems like CIFS for SMB shares. The map file format remains similar.
+Unmounting and Stopping autofs
+Unmount: To unmount file systems manually:		sudo umount /mnt/nfs/share1
+Stop autofs: To stop the autofs service:			sudo systemctl stop autofs
+Autofs works in a networked environment:
+    • A server hosts shared directories or files (likely via NFS or similar protocol).
+    • Multiple clients (Client 1, Client 2, ..., Client n) are connected to the server.
+    • Each client uses Autofs to automatically mount the shared folder from the server on demand.
+    • The mount happens only when the client accesses the shared folder.
+    • Once the shared content is idle or unused, Autofs can unmount it automatically, optimizing system resources.
+Advantages of autofs:
+NFS shared directories are not permanently connected – this frees network and system resources
+The automounter is configured on the client machine – no server side configuration is required.
+NFS shares are available to all users – subject to access permissions
+Autofs network setup involves a server and a client using NFS (Network File System) with Autofs for automatic mounting. This server is exporting the /share directory over the network (likely via NFS). The client system uses Autofs to automatically mount the shared folder from the server. The /share folder on the server will appear locally as /auto_mount on the client only when accessed.
+In real life, when configuring Autofs on the client, you'd use the server's IP in the map file, like:			share -fstype=nfs 192.168.43.237:/share
+Apt install nfs pacakges:	sudo apt install nfs-common nfs-kernel-server
+Lets walk through a complete NFS server-client setup using Autofs on Linux:
+cd ~			mkdir /share			touch /share/f1 /share/f2
+Cd /share		ls		nano /share/f1		nano /share/f2	chmod 777 /share
+root@Peer:/# nano /etc/exports			(edit the NFS export configuration file)
+	/share 192.168.43.22(ro,sync)
+Here 192.168.43.22 is the client IP
+You may add “subtree_check”after sync.
+exportfs -avr				(Applies the export settings & makes the share available to clients)
+firewall-cmd --add-service=nfs --add-service=mountd --add-service=rpc-bind --permanent 		(Opens necessary firewall ports for NFS to work)
+firewall-cmd --reload			(Reloads the firewall to apply changes)
+apt install nfs-common autofs	(Installs NFS client utilities and the Autofs package)
+root@Peer:/# showmount -e 192.168.2.103		(Shows exported directories from server)
+Export list for 192.168.2.103:
+/share 192.168.2.103
+root@Peer:/# vi /etc/auto.master			(Configure Autofs on Client)
+/misc /etc/auto.misc	(Add: This tells Autofs to use /etc/auto.misc to configure mounts under /auto_mount)
+/auto_mount /etc/auto.misc
+root@Peer:/# vi /etc/auto.misc
+access		-rw,soft,intr		192.18.2.103:/share
+#removable	-fstype=ext2		:/dev/hdd
+systemctl enable autofs --now		(Starts the Autofs service and enables it at boot)
+ls /			cd /auto_mount		ls		cd access	ls	cat f1 
+You're testing that: The folder /auto_mount/access exists, It automatically mounted the NFS share and You can list the files and read their contents (cat f1).
