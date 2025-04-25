@@ -1,0 +1,76 @@
+Users: A user is an entity that can log into a Linux system and own files or processes. User accounts are defined in /etc/passwd.
+Groups: Groups are collections of users used to manage permissions more efficiently.
+Group information is stored in /etc/group
+Creating a User Account
+Create a user account:				sudo useradd username
+Set a password for the user:			sudo passwd username
+Create a user with a home directory: By default, useradd might not create a home directory. Use the -m option to ensure a home directory is created:
+sudo useradd -m username
+Add user to a specific group:		sudo useradd -G groupname username
+									sudo usermod -aG groupname username
+
+adduser is more user-friendly and automatically creates a home directory.
+Create a user with adduser: 			sudo adduser username
+
+Deleting a User Account：					sudo userdel username
+Delete a user and their home directory:	sudo userdel -r username
+Delete a User							sudo deluser username
+Delete a Group						sudo groupdel groupname
+Modifying a User Account
+Change a user’s home directory:	
+sudo usermod -d /new/home/directory username
+Change a user’s username:		sudo usermod -l newusername oldusername
+Change a user’s primary group:	sudo usermod -g newgroup username
+Add a user to a supplementary group:	
+sudo usermod -aG groupname username
+Lock a user account:		sudo usermod -L username
+Unlock a user account:		sudo usermod -U username
+To change owner:			chown naqvi fstab
+    • Disable User								$ sudo passwd -1 user
+    • Enable User								$ sudo passwd -u user
+    • Force to change password on next login		$ sudo passwd -e user
+    • Max number of days a password remain valid	$ sudo passwd -x max_days user
+    • number of days to show a warning to change password $ sudo passwd -w warn_days user
+
+Viewing User Information
+View user account details:		id username
+Check user account status:		passwd -S username
+List all users:					cat /etc/passwd
+List Groups a User Belongs To		groups username
+Home Directory: The user's home directory is typically located at /home/username.
+sudo adduser Sargodha		ls -l				pwd			cd ..			ls -l		sudo bash		sudo bash sargodhaa		cat /etc/passwd		at end you will find sargodha user
+Now to add group:	addgroup --gid 1000 sales		addgroup --gid 1000 sales		addgroup --gid 10000 sales		addgroup --gid 10001 marketing		addgroup --gid 10002 technology		deluser Naqvi			groupdel Naqvi	
+usermod -a -G technology sargodha		To add user in a group
+cat /etc/passwd		You will find technology in sargodha sargodha	
+
+Question: Create a group newgroup and create a user harsh and make newgroup as the secondary group
+root@rahat:~# addgroup newgroup
+info: Selecting GID from range 1000 to 59999 ...
+info: Adding group `newgroup' (GID 1001) ...
+root@rahat:~# cat /etc/group
+naqvi:x:1000:
+_chrony:x:124:
+newgroup:x:1001:johnBak
+john:x:1002:
+johnBak:x:1003:
+sudo useradd -G newgroup harsh
+Question: Create a group newgroup and create a user nitin, do not add to newgroup as the secondary group. Nitin should have no loging shell
+root@rahat:~# useradd johnkeet -s /sbin/nologin
+Question: Create a group newgroup and assign all the above user password “redhat”
+root@rahat:~# cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+naqvi:x:1000:1000:Naqvi:/home/naqvi:/bin/bash
+_chrony:x:122:124:Chrony daemon,,,:/var/lib/chrony:/usr/sbin/nologin
+john:x:1001:1002::/home/john:/bin/sh
+johnBak:x:1002:1003::/home/johnBak:/bin/sh
+johnkeet:x:1003:1004::/home/johnkeet:/sbin/nologin
+root@rahat:~# root@rahat:~# passwd johnBak
+New password: 
+BAD PASSWORD: The password is shorter than 8 characters
+New password: 
+Retype new password: 
+passwd: password updated successfully
+Question: Create a user named Test, Set the password of the user Test as 12345
+Answer:		useradd Test
+				Passwd Test		12345	12345
