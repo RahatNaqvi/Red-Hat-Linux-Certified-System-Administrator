@@ -1,0 +1,73 @@
+It allows you to handle the lifecycle of containers and container images without needing Docker. Podman is a container engine compatible with Docker, while Skopeo is a tool for interacting with remote container registries.
+Using Podman (Container Engine)
+Podman provides a command-line interface (CLI) that is compatible with Docker, but it operates without a central daemon and can be run as a non-root user. It supports the full lifecycle of containers, from pulling images to running and managing containers.
+Installing Podman:			sudo apt update			sudo apt install -y podman
+Managing Containers
+    • Create a container from an image:
+			podman create --name my-container <image-name>:<tag>
+Example:				podman create --name my-nginx-container nginx:latest
+    • Run a container interactively:
+			podman run -it --rm <image-name>:<tag> /bin/bash
+Example:				podman run -it --rm nginx:latest /bin/bash
+    • Start a container:		podman start <container-name>
+Example:				podman start my-nginx-container
+    • Stop a running container:		podman stop <container-name>
+Example:						podman stop my-nginx-container
+    • List running containers:							podman ps
+To list all containers (including stopped ones):			podman ps -a
+    • Remove a container:			podman rm <container-name>
+Example:						podman rm my-nginx-container
+Managing Images
+    • Pull an image from a registry:			podman pull <image-name>:<tag>
+Example:								podman pull nginx:latest
+    • List local images:						podman images
+    • Remove an image:						podman rmi <image-name>:<tag>
+Example:								podman rmi nginx:latest
+Container Logs
+    • View logs of a container:			podman logs <container-name>
+Example:							podman logs my-nginx-container
+Networking and Exposing Ports
+    • Run a container and expose ports:
+podman run -d -p <host-port>:<container-port> <image-name>:<tag>
+Example:				podman run -d -p 8080:80 nginx:latest
+This command runs the container in the background (-d), exposing port 8080 on the host and port 80 on the container.
+Inspecting Containers
+    • Inspect a container's details:		podman inspect <container-name>
+Example:							podman inspect my-nginx-container
+    • Inspect a running container’s processes:	podman top <container-name>
+
+Using Skopeo (Container Image Management): Skopeo is a command-line utility that allows you to perform operations on container images without pulling them to your local machine. It can interact with container registries, copy images between registries, inspect remote images, and more.
+Installing Skopeo								sudo apt install skopeo
+Inspecting Remote Images: You can inspect images without pulling by using skopeo inspect. This is useful when you want metadata about an image without downloading the full image.
+skopeo inspect docker://<image-name>:<tag>
+Example:		skopeo inspect docker://nginx:latest
+This command will output detailed metadata (in JSON format) about the nginx:latest image from Docker Hub.
+Copying Images Between Registries
+Skopeo can copy images from one registry to another (for example, from Docker Hub to a private registry). This allows you to migrate container images without pulling them down locally.
+skopeo copy docker://<source-registry>/<image>:<tag> docker://<destination-registry>/<image>:<tag>
+Example:	skopeo copy docker://nginx:latest docker://myregistry.local/nginx:latest
+Pushing Images to a Registry
+You can push images from a local storage to a container registry with Skopeo (typically used in conjunction with Podman).
+skopeo copy oci:<local-image-dir> docker://<registry>/<image>:<tag>
+Example (assuming you have a local OCI image directory):
+skopeo copy oci:/path/to/oci-image-dir docker://myregistry.local/myimage:latest
+Listing Registries or Repositories
+You can also use Skopeo to interact with registries directly, although it’s mostly used for image copying and inspecting.		skopeo list-tags docker://<registry>/<image>
+Example:							skopeo list-tags docker://docker.io/nginx
+This will list all tags available for the nginx image on Docker Hub.
+Practical Use Cases for Podman and Skopeo
+    1. Push an image from your local system to a remote registry:
+        ◦ First, use Podman to build or pull the image: 
+        ◦ podman pull nginx:latest
+        ◦ Then use Skopeo to push it to your private registry: 
+        ◦ skopeo copy docker://nginx:latest docker://myregistry.local/nginx:latest
+    2. Automating Container Builds with Podman:
+        ◦ Use Podman to create a container from a Dockerfile: 
+        ◦ podman build -t my-app .
+        ◦ After building, you can inspect the image using Podman or push it using Skopeo.
+    3. Copying Images between Registries:
+        ◦ Suppose you have an image on Docker Hub and want to copy it to a local or private registry: 
+        ◦ skopeo copy docker://nginx:latest docker://myregistry.local/nginx:latest
+    4. Running Containers in Detached Mode:
+        ◦ Run a container in the background and expose ports: 
+        ◦ podman run -d -p 8080:80 nginx:latest
