@@ -1,0 +1,27 @@
+It involves resizing the LV and then resizing the file system to make use of the new space. 
+Increase the Size of the Volume Group (Optional)
+If you do not have enough free space in your volume group, you’ll need to add a new physical volume and extend the volume group.
+Add a New Physical Volume:	sudo pvcreate /dev/sdX
+Extend the Volume Group:		sudo vgextend <volume_group_name> /dev/sdX
+Extend the Logical Volume
+Check Free Space in the Volume Group:	sudo vgdisplay <volume_group_name>
+Extend the Logical Volume: 
+Extend by a specific size:		sudo lvextend -L +<size> <logical_volume_path>
+sudo lvextend -L +10G /dev/mapper/vg0-lv0
+Extend to use all available space:
+sudo lvextend -l +100%FREE <logical_volume_path>
+sudo lvextend -l +100%FREE /dev/mapper/vg0-lv0
+Resize the File System
+The file system must be resized to utilize the additional space.
+For ext4 File Systems:			sudo resize2fs <logical_volume_path>
+For xfs File Systems:			sudo xfs_growfs <mount_point>
+Note: xfs_growfs requires the logical volume to be mounted.
+Verify the Resize
+Check the Logical Volume Size:		sudo lvdisplay <logical_volume_path>
+Check the File System Size:			df -h
+Example Workflow
+Check the Current Volume and File System Size:		df -h
+sudo lvdisplay /dev/mapper/vg0-lv0
+Extend the Logical Volume:		sudo lvextend -L +5G /dev/mapper/vg0-lv0
+Resize the File System:			sudo resize2fs /dev/mapper/vg0-lv0  # For ext4
+Verify the Changes:			df -h
