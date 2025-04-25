@@ -1,0 +1,37 @@
+For this, you typically need to interact with a container registry service like Docker Hub, Google Container Registry (GCR), Amazon Elastic Container Registry (ECR), or other similar services. 
+Install Docker (or Container Runtime)
+If you haven't already installed Docker, do so by following the official Docker installation guide for your operating system:			Docker Installation Guide
+You can verify the installation by running:		docker --version
+Log In to the Registry (if required)
+If you're retrieving an image from a private registry (such as Docker Hub with private repositories, AWS ECR, or GCR), you will likely need to log in first. You can use the following commands:
+For Docker Hub:		docker login
+This will prompt you for your username and password for Docker Hub.
+For Google Container Registry (GCR):			gcloud auth configure-docker
+This authenticates Docker to use GCR with your Google Cloud credentials.
+For Amazon Elastic Container Registry (ECR):
+First, configure AWS CLI with your credentials:				aws configure
+Then authenticate Docker with ECR using the AWS CLI:
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+Search for Images in the Registry
+To search for available images, you have a few options:
+ Search on Docker Hub: Docker Hub has a web interface that allows you to search for images. Visit hub.docker.com and use the search bar to find the image you need. You can also use the Docker CLI to search on Docker Hub:			docker search <image-name>
+It returns a list of matching images with description, stars, and official status, etc
+Search in Google Container Registry (GCR): 
+gcloud container images list --repository=gcr.io
+Search in Amazon Elastic Container Registry (ECR)
+			aws ecr describe-repositories --region <region>
+Pull (Retrieve) the Image
+docker pull <registry>/<image>:<tag>
+    • <registry>: The address of the container registry (e.g., docker.io for Docker Hub, gcr.io for Google Cloud, aws_account_id.dkr.ecr.region.amazonaws.com for AWS ECR).
+    • <image>: The name of the image you want to pull.
+    • <tag>: The version or tag of the image you want to pull (e.g., latest, v1.0.0). If no tag is specified, Docker defaults to latest.
+For example, to pull the nginx image from Docker Hub:		docker pull nginx
+Or to pull a specific tag:								docker pull ubuntu:20.04
+Example for AWS ECR:
+docker pull <aws_account_id>.dkr.ecr.<region>.amazonaws.com/my-repository:latest
+Verify the Image: you can verify that it is available on your local system by running:
+docker images		Will list all available images on your machine.
+Running the Image			docker run -it <image-name>:<tag>
+For example:					docker run -it nginx
+    • Image Not Found: If the image isn't available, check for typos in the image name or tag. Ensure the image is public or you have access to it if it's private.
+    • Network Issues: Sometimes network restrictions or firewalls may block access to the remote registry.
