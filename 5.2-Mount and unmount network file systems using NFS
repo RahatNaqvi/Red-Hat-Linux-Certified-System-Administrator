@@ -1,0 +1,35 @@
+Mounting and unmounting Network File Systems (NFS) in Linux allows you to access remote file systems over a network. Here's how to do it:
+Installing NFS Utilities: Before mounting NFS shares, ensure that the necessary NFS client utilities are installed:
+sudo apt update  sudo apt install nfs-common  
+Mounting NFS File Systems
+Create a Mount Point:	sudo mkdir -p /mnt/nfs_share
+Mount the NFS Share: 
+sudo mount -t nfs <server_ip_or_hostname>:/path/to/nfs/export /mnt/nfs_share
+Example:		sudo mount -t nfs 192.168.1.100:/exported_folder /mnt/nfs_share
+Verify the Mount: 		df -h
+Persistent Mounting: Add an entry in the /etc/fstab file:			
+Edit /etc/fstab:			sudo nano /etc/fstab
+Add an NFS Entry:
+<server_ip_or_hostname>:/path/to/nfs/export  /mnt/nfs_share  nfs  defaults  0  0
+Example:	192.168.1.100:/exported_folder  /mnt/nfs_share  nfs  defaults  0  0
+Test the Configuration: Mount all file systems defined in /etc/fstab:
+sudo mount -a
+Unmounting NFS File Systems
+Unmount the NFS Share:			sudo umount /mnt/nfs_share
+Verify the Unmount: Check if the NFS share is unmounted:		df -h
+Additional Options:
+Mount Options: You can specify additional mount options for better control, such as:
+        ◦ rw: Read/write access.
+        ◦ ro: Read-only access.
+        ◦ noexec: Do not allow execution of binaries.
+        ◦ sync: Writes are synchronized immediately.
+Example:
+sudo mount -t nfs -o rw,sync 192.168.1.100:/exported_folder /mnt/nfs_share
+Check NFS Version: If needed, specify the NFS version to use:
+sudo mount -t nfs -o vers=4 192.168.1.100:/exported_folder /mnt/nfs_share
+Troubleshooting
+Firewall: Ensure that the firewall on both the client and server allows NFS traffic (ports 111 and 2049 by default).
+NFS Server Configuration: Ensure the NFS server has the appropriate export configuration in /etc/exports and that the NFS service is running.
+    • Permissions: Ensure user has the necessary permissions to access the NFS share.
+    • Network Stability: NFS relies on network stability; issues like latency or disconnections can affect performance.
+    • Unmount Properly: Always unmount the NFS share properly to avoid potential data corruption or loss.
