@@ -1,0 +1,52 @@
+It involves identifying the root cause of the issue, understanding SELinux's logs, and taking corrective action by either modifying the policy, adjusting booleans, or setting appropriate context. 
+Understanding SELinux AVC Denials: When SELinux enforces its policies, it can generate Access Vector Cache (AVC) denials when a process tries to perform an action that violates SELinux policy. These denials are logged, and reviewing these logs is the primary way to diagnose SELinux-related issues.
+Review SELinux Logs for AVC Denials: Identify if there are any AVC denials.
+Audit Logs: SELinux logs its denials in the audit logs. You can view these logs by using the ausearch command:						sudo ausearch -m avc -ts recent
+You can adjust the -ts parameter to specify a time range, such as -ts today, or -ts last_hour.
+System Logs: Look @ System logs (e.g., /var/log/messages or /var/log/syslog).
+			sudo tail -f /var/log/audit/audit.log
+journalctl: If you're using systemd, journalctl can also show SELinux messages:
+			sudo journalctl | grep selinux
+Identifying the Cause of the Denial: You will see details about the violation.
+    • Source process: The process that attempted the action (e.g., httpd, mysqld).
+    • Target: The resource the process tried to access (e.g., a file, directory, or network socket).
+    • Type of access: What the process tried to do (e.g., read, write, execute).
+    • SELinux contexts: The source and target contexts, which describe the security labeling of the process and the resource.
+    • Action denied: The specific action that was blocked (e.g., selinux-denied, avc denied).
+Example AVC denial log:
+type=AVC msg=audit(1637020531.389:225): avc:  denied  { read } for  pid=2132 comm="httpd" name="index.html" dev="sda1" ino=1234567 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:httpd_sys_content_t:s0 tclass=file
+    • scontext=system_u:system_r:httpd_t:s0: This is the security context of the process (in this case, httpd).
+    • tcontext=system_u:object_r:httpd_sys_content_t:s0: This is the security context of the file (index.html).
+    • tclass=file: The type of object being accessed (a file).
+    • denied { read }: The action that was denied (read access).
+From this, you can see that the httpd process is being denied read access to the index.html file due to mismatched security contexts.
+Addressing SELinux Policy Violations
+Once you've identified a violation, there are several ways to address it, depending on the nature of the issue:
+Check and Correct File Contexts: One common issue is when files or directories have incorrect SELinux contexts, leading to access being denied. If you find that the security context of the target file is incorrect, you can restore the default SELinux file contexts using restorecon.
+				sudo restorecon -v /path/to/file_or_directory
+For example, if index.html should be accessible by httpd, the file should have the httpd_sys_content_t context. You can restore it as follows:
+				sudo restorecon -v /var/www/html/index.html
+Adjust SELinux Boolean Settings: Sometimes, a denial may occur because a particular SELinux boolean is turned off (e.g., allowing a web server to connect to the network). You can use getsebool to check the status of a boolean and setsebool to adjust it.
+For example, if the denial involves the web server trying to connect to the network, you can enable the httpd_can_network_connect boolean:
+				sudo setsebool -P httpd_can_network_connect on
+You can check all booleans with:		getsebool -a
+Create a Custom SELinux Policy Module: If the default policy is insufficient to allow legitimate operations, you can create a custom SELinux policy module. The audit2allow tool can help generate the appropriate policy module based on AVC denials.
+Steps to create a custom policy module:
+    1. Generate the policy module: Use audit2allow 
+	sudo ausearch -m avc -ts recent | audit2allow -M my_custom_policy
+This will generate a policy module file called my_custom_policy.pp.
+    2. Install the module:			sudo semodule -i my_custom_policy.pp
+Adds your custom policy to SELinux system, allowing the previously denied action.
+Use the semanage Command to Modify Contexts: If you need to modify port contexts or file contexts in a more permanent way, you can use the semanage command.
+For example, if you need to change the SELinux context of a directory so that it can be accessed by httpd:
+	sudo semanage fcontext -a -t httpd_sys_content_t "/path/to/directory(/.*)?"
+	sudo restorecon -R /path/to/directory
+This ensures that the directory and all its subdirectories will have the correct httpd_sys_content_t context.
+Check the Status of SELinux: Sometimes, SELinux might be in permissive mode or fully disabled, which affects how it handles violations. 
+Check the SELinux status using:						sestatus
+If SELinux is in permissive mode, it logs policy violations but doesn't enforce them. You can switch to enforcing mode with:						sudo setenforce 1
+If SELinux is disabled and you need to enable it, you can modify the /etc/selinux/config file:
+SELINUX=enforcing				Then reboot the system.
+Test and Validate Changes： If you created or modified any custom policy modules, test the affected service or process thoroughly. You can re-check the audit logs to confirm that no new denials are occurring.
+Avoid Repetitive Policy Modifications
+If you frequently encounter a similar issue (e.g., a service always needs specific permissions), it’s best to identify the root cause of the violation and consider modifying the policy permanently, either by adjusting booleans, changing contexts, or creating a custom policy module, rather than applying temporary fixes.
