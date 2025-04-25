@@ -1,0 +1,42 @@
+It allows you to securely access a remote system without using passwords. Instead, you use an SSH key pair (private and public key) for authentication. 
+Generate SSH Key Pair on the Client Machine
+Generate a new SSH key pair: On the client machine (the machine you're connecting from), use the ssh-keygen command to generate the key pair.
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+        ◦ -t rsa: Specifies the type of key (RSA in this case).
+        ◦ -b 4096: Specifies the key length (4096 bits for strong encryption).
+        ◦ -C "your_email@example.com": Adds a comment (usually your email or name).
+Choose the file location: When prompted, you can press Enter to save the keys in the default location (~/.ssh/id_rsa).
+Set a passphrase (optional): You can set a passphrase for an additional layer of security. If you leave it empty, the key will not require a passphrase.
+Copy the Public Key to the Remote Server
+You need to copy the public key (~/.ssh/id_rsa.pub) to the remote server's ~/.ssh/authorized_keys file.
+Using ssh-copy-id (Recommended): The easiest way to copy the public key is using the ssh-copy-id utility.			ssh-copy-id username@remote_host
+Example:						ssh-copy-id user@192.168.1.100
+This will copy the public key to remote server & append it to the ~/.ssh/authorized_keys file.
+Manually Copy the Public Key
+Copy the public key: Copy the contents of your public key (~/.ssh/id_rsa.pub) to your clipboard.							cat ~/.ssh/id_rsa.pub
+Log in to the remote server: Log in to the remote server using your username and password.							ssh username@remote_host
+Create the .ssh directory on the remote server (if it doesn't already exist):
+mkdir -p ~/.ssh						chmod 700 ~/.ssh
+Add the public key to the authorized_keys file:
+echo "your_public_key_here" >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+Replace your_public_key_here with the contents of your public key.
+Test SSH Key-Based Authentication
+Try logging into the remote server: On the client machine, use SSH to log in to the remote server.				ssh username@remote_host
+You should be logged in without being prompted for a password. If you set a passphrase for the key, you’ll need to enter that instead.
+(Optional) Disable Password Authentication on the Remote Server
+For added security, you can disable password authentication on the remote server so that only key-based authentication is allowed.
+Edit the SSH configuration file on the remote server (or to add ssh file in etc folder)
+sudo nano /etc/ssh/sshd_config
+adduser rahatnaqvi
+Disable password authentication: Find and modify or add the following lines:
+PasswordAuthentication no				ChallengeResponseAuthentication no
+Restart the SSH service:				sudo systemctl restart sshd
+Managing SSH Keys
+a) Viewing the Public Key:				cat ~/.ssh/id_rsa.pub
+b) Removing SSH Keys:
+Simply delete the corresponding line in the ~/.ssh/authorized_keys file on the server.
+nano ~/.ssh/authorized_keys
+c) Backing Up SSH Keys
+Simply copy the private key (id_rsa) and public key (id_rsa.pub) to a safe location.
+cp ~/.ssh/id_rsa ~/.ssh/id_rsa.pub /path/to/backup/
