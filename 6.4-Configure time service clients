@@ -1,0 +1,44 @@
+It is often managed using the NTP (Network Time Protocol), and more recently systemd-timesyncd or chrony (depending on your distribution). Time synchronization ensures that your system clock is accurate by synchronizing it with reliable time servers over the network.
+There are multiple methods available for configuring time service clients on Linux, and I will describe how to configure them using both systemd-timesyncd (the default service for many distributions) and chrony.
+Using systemd-timesyncd (Default for Modern Linux Distributions)
+systemd-timesyncd is a lightweight time synchronization service included with systemd. It is commonly enabled by default in many modern distributions 
+Enable and Start systemd-timesyncd
+Check if systemd-timesyncd is active:	sudo systemctl status systemd-timesyncd
+Enable systemd-timesyncd to start at boot:	sudo systemctl enable systemd-timesyncd
+Start systemd-timesyncd immediately:		sudo systemctl start systemd-timesyncd
+Configure Time Servers
+The default configuration for systemd-timesyncd uses public NTP servers, but you can configure your own time servers.
+Edit the timesyncd configuration file:	sudo nano /etc/systemd/timesyncd.conf
+Find the NTP line, and add or modify the servers you want to use. For example:
+[Time]
+NTP=0.pool.ntp.org 1.pool.ntp.org
+You can add more NTP servers or use your internal servers if required.
+Save and exit the file. After making changes, restart systemd-timesyncd to apply the configuration:				sudo systemctl restart systemd-timesyncd
+Check Synchronization Status
+timedatectl status		Show current time, timezone, and NTP synchronization status
+E.g. 
+timedatactl			active
+timedatectl set-ntp false		
+timedatactl			inactive
+timedatectl set-ntp true		
+timedatactl			active
+Using chrony (Advanced Time Synchronization)
+Install and Configure chrony
+sudo apt update
+sudo apt install chrony	or 		sudo apt install chrony -y
+Enable chrony to start automatically at boot:	sudo systemctl enable chronyd
+Start the service immediately:					sudo systemctl start chronyd
+Configure Time Servers in chrony
+Edit the configuration file:		sudo nano /etc/chrony/chrony.conf
+Find the server lines and modify or add new time servers. For example:
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+You can add multiple server lines to specify different NTP servers.
+Save and exit the configuration file.	
+Restart the chronyd service to apply the changes:	sudo systemctl restart chronyd
+Verify Synchronization with chrony:		chronyc tracking
+You can also use the chronyc sources command to view the servers that your system is synchronized with:							chronyc sources
+By configuring the NTP clients (systemd-timesyncd, chrony, or ntpd), you ensure that your system clock is synchronized with reliable time servers, which is essential for accurate timestamps, logs, and network-related tasks.
+naqvi@rahat:/etc/apt$ systemctl status chronyd
+systemctl stop chronyd
+naqvi@rahat:/etc/apt$ systemctl disable chronyd
