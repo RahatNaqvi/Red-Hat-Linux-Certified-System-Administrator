@@ -1,0 +1,25 @@
+systemd manages system boot and runlevels (referred to as "targets"). By configuring the default target, you can control the system's boot behavior and specify which target the system should boot into automatically.
+Understanding Systemd Targets
+    • default.target – Typically a multi-user or graphical target.
+    • graphical.target – A multi-user system with a graphical user interface (GUI).
+    • multi-user.target – Boot into a multi-user system without a GUI. 
+    • rescue.target – A single-user mode, minimal system for recovery purposes.
+    • emergency.target – A more minimal mode for emergency repair tasks (often for very low-level issues).
+    • poweroff.target – Shutdown the system.
+Setting the Default Boot Target
+We use the systemctl set-default command. For example, to set the system to boot into GUI run:				sudo systemctl set-default graphical.target
+Checking the Current Default Target
+sudo systemctl get-default
+Changing to a Specific Target Immediately
+If you want to switch to a specific target without rebooting, use the systemctl isolate:
+sudo systemctl isolate multi-user.target
+sudo systemctl isolate graphical.target
+Reverting to the Default Target After a Change
+If you change the target temporarily (using systemctl isolate), you can return to the default target with:				sudo systemctl default
+This will boot the system into the default target that was previously set.
+Example Use Case
+Let’s say you want to set your system to boot without a GUI (a server setup) but would like the ability to start the GUI manually if needed.
+Set the default boot target to multi-user.target:
+sudo systemctl set-default multi-user.target
+After booting, if you decide you need the GUI, you can start it with:
+sudo systemctl start graphical.target
