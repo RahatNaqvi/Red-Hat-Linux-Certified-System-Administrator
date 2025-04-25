@@ -1,0 +1,16 @@
+To restore default file contexts in Linux (for example, SELinux contexts), you can use the restorecon command, which applies the default security contexts to files and directories based on SELinux policy. 
+Step 1: Identify the file or directory
+You need to know which files or directories have the incorrect or modified contexts.
+Step 2: Use restorecon
+To restore the default contexts, use the restorecon command. The general syntax is:
+sudo restorecon -v /path/to/file_or_directory
+The -v flag to see what files are being processed.
+Replace /path/to/ with the actual path of the file or directory you want to restore.
+Step 3: Restore contexts recursively (if needed)
+If you want to restore the contexts for an entire directory and its subdirectories, you can use the -R option:				sudo restorecon -R -v /path/to/directory
+Step 4: Verify the restoration				ls -Z /path/to/file_or_directory
+Restoring all file contexts (if necessary)
+If you want to restore the contexts for all files in the system, you can use the find command combined with restorecon. However, this should be used cautiously since it may take a long time and impact many files.				sudo find / -type f -exec restorecon -v {} \;
+Alternative: Check SELinux status
+If you're using SELinux, you can also check its status and troubleshoot related issues with:
+sestatus			This will show whether SELinux is enforcing, permissive, or disabled, which can affect file context management.
