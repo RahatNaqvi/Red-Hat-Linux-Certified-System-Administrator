@@ -1,0 +1,71 @@
+It allows users in a group to collaborate by ensuring that files and directories created within the Set-GID directory inherit the group ownership of the parent directory. This is useful in collaborative environments where multiple users need to work on shared files.
+Create the Directory
+Create a New Directory:		sudo mkdir /path/to/shared_directory
+Set the Group Ownership: Assign the directory to a specific group:
+sudo chgrp <groupname> /path/to/shared_directory
+Set the Set-GID Bit: Apply the Set-GID Bit: This ensures that files created within the directory inherit the group ownership of the directory.
+sudo chmod g+s /path/to/shared_directory
+Verify the Set-GID Bit: Confirm the s in the group permission field:
+ls -ld /path/to/shared_directory
+drwxrwsr-x 2 root developers 4096 Jan  5 12:00 shared_directory
+Adjust Permissions for Collaboration
+Set Directory Permissions: 	sudo chmod 770 /path/to/shared_directory
+This gives the owner and group full permissions while restricting access for others.
+Add Users to the Group:		sudo usermod -aG <groupname> <username>
+							usermod -a -G sudo,adm rahatnaqvi
+							if failed, reboot
+Verify Group Membership: groups <username>
+Test the Configuration
+Switch to a User in the Group:			su - <username>
+Create a File in the Directory:			touch /path/to/shared_directory/testfile
+Check the File’s Group Ownership:		ls -l /path/to/shared_directory
+The group ownership should match the group of the directory.
+Automate with ACLs (Optional)
+For complex permission, you can use Access Control Lists (ACLs) to fine-tune permissions:
+Install ACL Tools (if not already installed):		sudo apt install acl
+Set ACL for Default Group Permissions:
+sudo setfacl -d -m g:<groupname>:rwx /path/to/shared_directory
+Verify ACL Settings:		getfacl /path/to/shared_directory
+File Masking: Ensure the file creation mask (umask) is correctly set to allow the desired permissions for newly created files.
+Question:	Create a directory /linux, make the group owner to be syeds
+Answer:
+root@rahat:/var# mkdir /linux
+root@rahat:/linux# ls -ld
+drwxr-xr-x 2 root root 4096 Dec 26 09:23 .
+root@rahat:/# ls -ld linux
+drwxr-xr-x 2 root root 4096 Dec 26 09:23 linux
+root@rahat:/# chown :syeds linux
+root@rahat:/# ls -ld linux
+drwxr-xr-x 2 root syeds 4096 Dec 26 09:23 linux
+Question: Create a directory /linux, ensure that all files within /linux directory, group owner is syeds.
+Answer:
+root@rahat:/# mkdir linux/d1
+root@rahat:/# touch linux/fq
+root@rahat:/# ls -l linux
+total 4
+drwxr-xr-x 2 root root 4096 Dec 26 09:28 d1
+-rw-r--r-- 1 root root    0 Dec 26 09:28 fq
+root@rahat:/# chown -R :syeds linux
+root@rahat:/# ls -l linux
+total 4
+drwxr-xr-x 2 root syeds 4096 Dec 26 09:28 d1
+-rw-r--r-- 1 root syeds    0 Dec 26 09:28 fq
+Question: Create a directory /linux, ensure that for all feature files within /linux, the group owner is syeds
+Answer:
+root@rahat:/# chmod g+s linux
+root@rahat:/# mkdir linux/d2
+root@rahat:/# touch linux/fq2
+root@rahat:/# ls -l linux
+total 8
+drwxr-xr-x 2 root syeds 4096 Dec 26 09:28 d1
+drwxr-sr-x 2 root syeds 4096 Dec 26 09:31 d2
+-rw-r--r-- 1 root syeds    0 Dec 26 09:28 fq
+-rw-r--r-- 1 root syeds    0 Dec 26 09:31 fq2
+
+Question: Create a directory /linux, ensure that no user other than the user-owner of /linux is able to delete the contents within /linux.
+Answer:			
+root@rahat:/# ls -ld /linux
+drwxr-sr-x 4 root syeds 4096 Dec 26 09:31 /linux
+root@rahat:/# chmod +t /linux
+root@rahat:/# ls -ld /linux
+drwxr-sr-t 4 root syeds 4096 Dec 26 09:31 /linux
