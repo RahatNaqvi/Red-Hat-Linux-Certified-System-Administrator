@@ -1,0 +1,50 @@
+Creating File Systems
+Create a vfat File System:		sudo mkfs.vfat /dev/sdXn
+Create an ext4 File System:		sudo mkfs.ext4 /dev/sdXn
+Create an xfs File System:		sudo mkfs.xfs /dev/sdXn
+Mounting File Systems
+Create a Mount Point:		sudo mkdir -p /mnt/mypoint
+Mount the File System:
+        ◦ For vfat: 		sudo mount -t vfat /dev/sdXn /mnt/mypoint
+        ◦ For ext4: 		sudo mount -t ext4 /dev/sdXn /mnt/mypoint
+        ◦ For xfs: 		sudo mount -t xfs /dev/sdXn /mnt/mypoint
+Verify the Mount:		df -h
+Unmounting File Systems
+Unmount the File System:		sudo umount /mnt/mypoint
+Verify the Unmount:			df -h
+Using File Systems: Once mounted, you can read from and write to the file system like any other directory.
+e.g. 	cd /mnt/mypoint			touch testfile				ls -l
+Setting Permissions (For ext4 and xfs):	
+sudo chown user:group /mnt/mypoint			sudo chmod 755 /mnt/mypoint
+Listing Contents:			ls /mnt/mypoint
+Persistent Mounting: To automatically mount the file system at boot, add an entry to /etc/fstab:
+Find UUID:				sudo blkid /dev/sdXn
+Edit /etc/fstab:			sudo nano /etc/fstab
+Add an Entry:
+        ◦ For vfat: 	UUID=your-uuid  /mnt/mypoint  vfat  defaults  0  0
+        ◦ For ext4: 	UUID=your-uuid  /mnt/mypoint  ext4  defaults  0  1
+        ◦ For xfs: 	UUID=your-uuid  /mnt/mypoint  xfs  defaults  0  1
+Additional Commands
+Check File System:
+        ◦ vfat does not have a native fsck tool, but you can use fsck: 
+sudo fsck.vfat /dev/sdXn
+        ◦ ext4: 			sudo fsck.ext4 /dev/sdXn
+        ◦ xfs: 			sudo xfs_repair /dev/sdXn
+Resize File System:
+        ◦ ext4: 						sudo resize2fs /dev/sdXn
+        ◦ xfs (can only grow): 			sudo xfs_growfs /mnt/mypoint
+Create a file system from startis pool: Stratis is a local storage management solution. It uses the xfs file system only.
+        ◦ apt update				sudo apt install stratis-cli stratisd -y
+        ◦ systemctl start stratisd		systemctl enable stratisd
+        ◦ create a strtis pool 	stratis pool create pool1 /dev/xyz
+Lets set up a Stratis storage pool and filesystem on a Linux system
+        ◦ systemctl start stratisd
+        ◦ systemctl enable stratisd
+        ◦ Create a Stratis pool:		stratis pool create pool1 /dev/nvme0n5	It creates a pool named pool1 using the block device /dev/nvme0n5
+        ◦ stratis pool list
+        ◦ Create a filesystem on the pool:		stratis filesystem create pool1 fs1
+        ◦ stratis filesystem list
+        ◦ Create a mount point:		m	kdir /fs1
+        ◦ First, find the UUID of the filesystem:	blkid	then nano /etc/fstab
+UUID=xxxx-xxxx /fs1 xfs defaults,x-systemd.requires=stratisd.service 0 0
+Then				mount -a
