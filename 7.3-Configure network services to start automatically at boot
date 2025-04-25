@@ -1,0 +1,24 @@
+It involves enabling the appropriate services using the system's tool, typically systemd. 
+Check the Service Status
+Before enabling a service to start at boot, you can check its current status.
+sudo systemctl status <service-name>
+Replace <service-name> with the name of the service you want to check (e.g., network, NetworkManager, networking, or any specific network-related service).
+Enable the Service to Start at Boot: use the systemctl enable command.
+For NetworkManager:			sudo systemctl enable NetworkManager
+For traditional network service (used in some Red Hat-based distributions):
+sudo systemctl enable network
+For systemd-networkd (if using systemd for network management):
+sudo systemctl enable systemd-networkd
+Start the Service Immediately
+To start the service immediately without waiting for the next reboot:
+sudo systemctl start <service-name>
+Verify the Service is Enabled:			sudo systemctl is-enabled <service-name>
+Check Logs (Optional): If you encounter issues or want to confirm the service started.  
+sudo journalctl -u <service-name>
+Example Services
+Here are common network-related services you might want to enable:
+    • NetworkManager: Manages network connections in many Linux distributions.
+    • systemd-networkd: A system service that manages networks.
+    • networking: A more traditional network service used in some distributions.
+Reboot to Test:			sudo reboot
+sudo systemctl status <service-name>
