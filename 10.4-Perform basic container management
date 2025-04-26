@@ -1,0 +1,166 @@
+It can be done using tools like Podman or Docker. 
+Using Podman (Container Engine)
+Podman is a popular container engine that is fully compatible with Docker, and it can be run as a non-root user. Here's how you can perform basic container management using Podman.
+Install Podman:			sudo apt update			sudo apt install -y podman
+Question: create a container named Web1 from the image at docker.io/centos/httpd from the user named Nick
+useradd Nick				passwd Nick		ssh Nick@localhost			whoami	
+Yum install podman @container-tools			podman login registry.redhat.io	(For this register on redhat)
+Podman pull docker.io/centos/httpd				podman images
+First create directory, then run podman 	podman run -d --name Web1 2cchkjfsd5400				podman ps
+
+Question: Create a container named Web2 =, map the port 8080:80 and a mount volume /home/Nick/web on the system to /var/www/html on the container
+Mkdir /home/Nick/Web
+podman run -d --name Web2 -p 8080:80 -v /home/Nick/web: /var/www/html:Z cchkjfsd5400				podman ps
+Question: Run a container as a system service. Name the service as container-Web2.service
+Answer: if you want to map /web then u cant make dir in root as normal username
+[Nick@client ~]$ mkdir -p ~/.config/systemd/user
+[Nick@client ~]$ cd ~/.config/systemd/user
+[Nick@client user]$ podman generate systemd --name Web2 --files --new
+/home/Nick/.config/systemd/user/container-Web2.service
+[Nick@client user]$ ls
+container-Web2.service
+[Nick@client user]$ nano container-Web2.service
+Here you will find the web2 details and end should be “Wantedby = deafult.target”
+Systemctl --user daemon-reload
+Systemctl --user start container-Web2.service				
+Systemctl --user enable container-Web2.service		
+Systemctl --user status container-Web2.service				
+Cd /home/Nick/web			nano index.html		(Tis is a sample web page)
+Curl localhost:8080/index.html
+Question: Create/build a container named watcher as baljit user using http://server1.net3.example.com/Containerfile
+Answer: adduser baljit 	–	 password		
+mkdir -p ~/container-builds 				cd ~/container-builds
+curl -o Containerfile http://server1.net3.example.com/Containerfile
+docker build -t watcher-image -f Containerfile 
+docker run -d --name watcher watcher-image 
+Question: Mount /data/input directory to /data/input directory on the container
+Mkdir /data/input			chown Baljit:Baljit /data/input
+sudo mkdir -p /data/input
+podman run -d --name watcher -v /data/input:/data/inpur watcher		podman ps
+# Using docker:	docker run -v /data/input:/data/input --name watcher_container watcher
+Question: Container should run as systemd service named as container- watcher.service
+nano /etc/systemd/system/container-watcher.service
+At the end of “WantedBy=multi-user.target”
+sudo systemctl daemon-reload
+sudo systemctl enable container-watcher.service
+sudo systemctl start container-watcher.service
+sudo systemctl status container-watcher.service
+Running a Container
+To run a container interactively:		
+podman run -it --rm <image-name>:<tag> <command>
+Example (run the nginx container interactively):	
+podman run -it --rm nginx:latest /bin/bash
+This command does the following:
+    • -it: Runs the container interactively (with a terminal).
+    • --rm: Removes the container once it stops.
+    • nginx:latest: Specifies the image (nginx in this case) and its tag (latest).
+    • /bin/bash: Executes the command /bin/bash inside the container (if you want an interactive shell).
+Running a Container in the Background (Detached Mode): To run a container in detached mode (in the background):
+		podman run -d --name <container-name> <image-name>:<tag>
+Example (run nginx in detached mode):
+		podman run -d --name my-nginx-container nginx:latest
+This command does the following:
+    • -d: Runs the container in detached mode (in the background).
+    • --name: Specifies a name for the container (my-nginx-container).
+Listing Running Containers:						podman ps
+To list all containers, including stopped ones:			podman ps -a
+Example output:
+CONTAINER ID  IMAGE                            COMMAND     CREATED        STATUS            PORTS  NAMES
+1234567890ab  docker.io/library/nginx:latest  nginx -g 'daemon off;'  2 minutes ago  Up 2 minutes   0.0.0.0:8080->80/tcp  my-nginx-container
+Stopping a Running Container:				podman stop <container-name>
+Example (stop the container named my-nginx-container): 
+podman stop my-nginx-container
+Starting a Stopped Container:			podman start <container-name>
+Example (start my-nginx-container):		podman start my-nginx-container
+1.2.6 Removing a Stopped Container:	podman rm <container-name>
+Example (remove my-nginx-container):	podman rm my-nginx-container
+If you want to remove a running container, you must stop it first using podman stop.
+Using Docker (Container Engine)： If you're using Docker, the commands are similar, but Docker operates with a daemon and typically requires root privileges unless set up otherwise.
+Install Docker：			sudo apt update		sudo apt install -y docker.io
+Running a Container：	docker run -it --rm <image-name>:<tag> <command>
+Example (run the nginx container interactively):
+			docker run -it --rm nginx:latest /bin/bash
+This command does the following:
+    • -it: Runs the container interactively (with a terminal).
+    • --rm: Removes the container once it stops.
+    • nginx:latest: Specifies the image (nginx in this case) and its tag (latest).
+    • /bin/bash: Executes the command /bin/bash inside the container (if you want an interactive shell).
+Running a Container in the Background (Detached Mode)
+		docker run -d --name <container-name> <image-name>:<tag>
+Example (run nginx in detached mode):
+		docker run -d --name my-nginx-container nginx:latest
+-d: Runs the container in detached mode (in the background).
+--name: Specifies a name for the container (my-nginx-container).
+Listing Running Containers： docker ps 		docker ps -a
+Example output:
+CONTAINER ID   IMAGE                             COMMAND                  CREATED          STATUS          PORTS                  NAMES
+1234567890ab   nginx:latest                      "nginx -g 'daemon off;'"  2 minutes ago    Up 2 minutes    0.0.0.0:8080->80/tcp   my-nginx-container
+Stopping a Running Container：	docker stop <container-name>
+Example (stop the container named my-nginx-container):docker stop my-nginx-container
+Starting a Stopped Container：			docker start <container-name>
+Example (start my-nginx-container):			docker start my-nginx-container
+Removing a Stopped Container：			docker rm <container-name>
+Example (remove my-nginx-container):		docker rm my-nginx-container
+If you want to remove a running container, you must stop it first using docker stop.
+Question:		Pull a container image
+				Run a container
+				Map the container to a local directory
+				Run the container as service
+podman search httpd (This would show results for public images of "httpd" without needing to log in). However, podman login <registry> (You would be prompted to enter a username and password (provided during the exam) to authenticate with the registry). In exams will be provided surely alongwith username and password.
+Podman pull docker.io/library/httpd
+Podman images
+Podman rmi rsyslog
+Podman images
+This will help you understand what each command does and how they fit together to manage and run containers in a rootless, systemd-integrated way:
+🔹 Podman Basics & HTTP Server Setup
+podman pull docker.io/library/httpd	#Pulls the Apache HTTP Server image from Docker Hub.
+podman rsyslog 	podman images			#Lists all container images available locally.
+podman run -d --name web1 ghdss7fgdcs
+Runs a container named web1 in detached mode (-d) from image ghdss7fgdcs 
+podman ps				Shows all running containers.
+🔹 Port Mapping
+podman run -d --name web2 -p 8080:80 llsghdss7fgdcs
+    • Maps port 8080 on the host to port 80 in the container. You can now access the containerized Apache server via localhost:8080.
+curl localhost:8080
+    • Tests if the container’s web server is accessible.
+🔹 Stopping Containers & Accessing Bash
+podman stop web1
+    • Stops the container named web1.
+podman run -it jhif7sdf78dhisdf /bin/bash
+    • Starts a container and gives you interactive terminal access inside it.
+hostname
+find / -name index.html
+    • Locates the index.html file inside the container.
+cat usr/local/apache2/htdocs/index.html
+    • Displays the contents of the default Apache landing page.
+🔹 Creating Custom HTML Page
+mkdir /web
+nano /web/mypage.html			just write anything like abc
+curl localhost:8080					Still checking web server availability.
+🔹 Volume Mapping (Host to Container)
+podman run -d --name web4 -p 8080:80 -v /web:/usr/local/apache2/htdocs jhdsfdfu78sd8b
+    • Mounts the /web directory from host to the container’s Apache web root, effectively hosting your custom HTML page.				podman ps		
+🔹 Generate and Manage Systemd Unit for Containers
+podman generate systemd web5 > /etc/systemd/system/web5-container.service
+systemctl daemon-reload
+systemctl start web5-container
+systemctl status web5-container
+    • Generates a systemd unit file for the web5 container and enables system-level management.
+systemctl enable web5-container
+    • Ensures the container starts automatically on system reboot.
+🔹 Rootless Containers (User Systemd)
+Note: Conatiner of one user will be invisible to other users so we will create another container.
+podman run -d --name New -p 8085:80 dsadasd87ds8
+mkdir -p ~/.config/systemd/user
+podman generate systemd New > ~/.config/systemd/user/New-container.service
+systemctl --user daemon-reload
+systemctl --user start New-container
+systemctl --user status New-container
+    • Creates a rootless container with systemd integration. This works per user (won’t affect or be visible to other users).
+nano ~/.config/systemd/user/New-container.service
+    • Optional manual editing of the systemd service file.
+[Install]
+WantedBy=default.target
+    • Makes sure the user-level service starts at login using:
+systemctl --user enable New-container
+systemctl --user daemon-reload		systemctlctl --user start New-container	systemctl status New-container 
