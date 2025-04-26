@@ -1,0 +1,60 @@
+For this, you can create a systemd unit file. This file will define the container as a service and enable it to start at boot. You can do this for Podman or Docker containers, and the process is very similar in both cases.
+Using Podman to Create a systemd Service
+Podman is a container engine that doesn't require a daemon, making it easy to manage containers as systemd services.
+Enable Podman to Start as a Systemd Service: Podman can generate systemd unit files automatically using podman generate systemd. 
+Run the Podman Container (if not already running): Let's assume you want to run an nginx container, and you want it to start automatically on boot.
+Run the container first:		podman run -d --name nginx-container -p 8080:80 nginx
+Generate the systemd Service Unit File
+podman generate systemd --name nginx-container --files
+It will create in directory, it defines how container should be managed by systemd.
+Move the systemd Unit File to the Appropriate Directory: Such as systemd unit directory (e.g., /etc/systemd/system/):	sudo mv nginx-container.service /etc/systemd/system/
+Reload systemd to Recognize the New Service (new unit file)
+			sudo systemctl daemon-reload
+Enable and Start the Service
+sudo systemctl enable nginx-container.service
+sudo systemctl start nginx-container.service
+Now, the nginx-container will automatically start whenever the system boots.
+Check the Status of the Service: sudo systemctl status nginx-container.service
+Using Docker to Create a systemd Service
+For Docker, the process is slightly different, but the overall idea is the same: create a systemd unit file, enable the service, and configure it to start automatically.
+Run the Docker Container (if not already running)
+Let’s assume you want to run the same nginx container with Docker. Start the container first:				docker run -d --name nginx-container -p 8080:80 nginx
+Create a systemd Service Unit File for Docker
+Create a systemd service unit file manually. Open a new unit file for editing:
+	sudo nano /etc/systemd/system/docker-nginx-container.service
+Add the following content:
+[Unit]
+Description=Nginx container
+After=network.target
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a nginx-container
+ExecStop=/usr/bin/docker stop -t 2 nginx-container
+[Install]
+WantedBy=multi-user.target
+Explanation of the fields:
+    • Description: A brief description of the service.
+    • After: This ensures that the container starts after the network is up.
+    • ExecStart: This tells systemd to start the container using docker start -a (where -a attaches the container to the terminal).
+    • ExecStop: This tells systemd how to stop the container. The -t 2 option ensures Docker stops the container gracefully with a 2-second timeout.
+    • WantedBy: This ensures the service is enabled for the multi-user target, meaning it will start during boot.
+Reload systemd to Recognize the New Service:	sudo systemctl daemon-reload
+Enable and Start the Service
+sudo systemctl enable docker-nginx-container.service
+sudo systemctl start docker-nginx-container.service
+Check the Status of the Service:		sudo systemctl status docker-nginx-container.service
+Additional Configuration for Container Services
+Container Logs: If your service produces logs, you can view them using the journalctl command:					journalctl -u nginx-container.service
+Autorestart and Restart Policies: You can configure systemd to automatically restart the container service if it crashes or fails. This can be done by modifying the Restart option in the systemd unit file.
+For Podman or Docker, use:
+[Service]
+Restart=always
+Alternatively, you can set more specific restart policies:
+Restart=on-failure – Restart only when the container exits with a non-zero exit code.
+Restart=on-abort – Restart only if the container terminates abnormally.
+Restart=never – Do not restart the container (default).
+Handling Dependencies: If you need your container service to depend on other services (e.g., a database), you can configure it to wait for those services to be ready. Use the After and Requires directives in the systemd unit file. Example (wait for network and a database service):
+[Unit]
+Description=My Web App
+After=network.target mysql.service
+Requires=mysql.service
