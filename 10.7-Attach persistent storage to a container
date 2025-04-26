@@ -1,0 +1,45 @@
+Attaching persistent storage to a container in Linux systems allows you to preserve data even if the container is stopped or removed. By default, data inside a container is ephemeral, meaning it is lost when the container is deleted. To ensure data persists, you need to mount external storage into the container, which can be done using volumes or bind mounts. This can be done with both Podman and Docker.
+Persistent Storage Options
+    1. Volumes: Managed by the container engine (Podman/Docker). Volumes are stored outside container filesystem & provide easy data management and backup options.
+    2. Bind Mounts: Bind a directory or file from the host filesystem to the container. This gives the container access to a specific path on the host.
+Using Podman for Persistent Storage
+Podman provides a command to create and use volumes. Volumes are stored in a specific location (/var/lib/containers/storage/volumes/ by default) and are managed by Podman.
+Create a Podman Volume: 			podman volume create my_volume
+You can inspect the volume using:		podman volume inspect my_volume
+Mount the Volume into a Container: Use the -v or --mount option. 
+Here’s an example of how to run an nginx container and mount the my_volume volume to /usr/share/nginx/html inside the container:
+podman run -d -p 8080:80 -v my_volume:/usr/share/nginx/html nginx
+-v my_volume:/usr/share/nginx/html: This mounts the my_volume volume to /usr/share/nginx/html inside the container. Data written to this path inside the container will be stored in the volume, preserving it even if the container is removed.
+List Podman Volumes:			podman volume ls
+Using Bind Mounts with Podman: A bind mount maps a directory or file on the host to a path inside the container. This is useful when you need to share specific files between the host and the container.
+Mount a Host Directory into a Container: Use the -v option with the full path to the host directory. E.g., to mount a host directory (/home/user/data) to /data inside the container:
+		podman run -d -p 8080:80 -v /home/user/data:/data nginx
+    • -v /home/user/data:/data: This will mount the host directory /home/user/data to /data inside the container.
+Using Docker for Persistent Storage
+Create and Use a Docker Volume: Docker also provides a way to create volumes, which are managed by Docker and stored in a default location (/var/lib/docker/volumes/).
+Create a Docker Volume:		docker volume create my_volume
+You can inspect it using:		docker volume inspect my_volume
+Mount the Volume into a Container: Use the -v or --mount option. For example, run an nginx container and mount the volume to /usr/share/nginx/html:
+	docker run -d -p 8080:80 -v my_volume:/usr/share/nginx/html nginx
+-v my_volume:/usr/share/nginx/html: This mounts the my_volume volume to the /usr/share/nginx/html directory inside the container. Data stored in this directory inside the container will be saved to the volume, even if the container is removed.
+List Docker Volumes
+You can list all volumes in Docker with:				docker volume ls
+Using Bind Mounts with Docker:	A bind mount allows you to directly mount a host directory into the container. This is useful if you want the container to access specific files or directories from the host.
+Mount a Host Directory into a Container
+Use the -v option with the full path of the host directory:
+docker run -d -p 8080:80 -v /home/user/data:/data nginx
+-v /home/user/data:/data: This mounts the /home/user/data directory from the host to /data inside the container. Changes to the /data directory inside the container will be reflected on the host directory /home/user/data.
+Persistent Storage Use Cases and Best Practices
+    1. Database Storage:
+        ◦ If you're running a database container (e.g., MySQL, PostgreSQL), it’s crucial to mount a persistent volume for the database’s data directory to avoid losing your data when the container is stopped or removed. Example with MySQL:  docker run -d -p 3306:3306 -v mysql_data:/var/lib/mysql mysql
+    2. Web Server Files:
+        ◦ When running web servers like Nginx or Apache, mount a volume or bind mount to store your website files, logs, and configurations persistently.
+Example with Nginx (using a volume): 
+docker run -d -p 8080:80 -v nginx_data:/usr/share/nginx/html nginx
+    3. Backup and Migration:
+        ◦ Volumes allow you to easily back up and migrate data across different environments. You can back up a volume by copying its content to another location or even across different hosts. To back up a volume: 
+        ◦ docker run --rm -v my_volume:/volume -v $(pwd):/backup alpine tar cvf /backup/backup.tar /volume
+    4. Bind Mounts for Configuration Files:
+        ◦ If you need to use configuration files or directories from the host inside the container (such as application configs), bind mounts are helpful.
+        ◦ Example with a bind mount: 
+        ◦ docker run -d -v /path/to/config:/app/config myapp
